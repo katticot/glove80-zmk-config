@@ -1,9 +1,0 @@
-# Glove80 key probe — started 2026-09-10T17:03:31.417184
-17:03:31  result=Alt+c              keysym=c            char='c'      keycode=134217827 state=0x0008
-17:03:31  result=Alt+Meta_L         keysym=Meta_L       char=(none)   keycode=922810622 state=0x0008
-17:03:26  result=Escape             keysym=Escape       char=(none)   keycode=889192475 state=0x0000
-17:03:25  result=Escape             keysym=Escape       char=(none)   keycode=889192475 state=0x0000
-17:03:25  result=Escape             keysym=Escape       char=(none)   keycode=889192475 state=0x0000
-17:03:24  result=Escape             keysym=Escape       char=(none)   keycode=889192475 state=0x0000
-17:03:23  result=Escape             keysym=Escape       char=(none)   keycode=889192475 state=0x0000
-

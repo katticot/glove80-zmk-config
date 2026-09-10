@@ -4,6 +4,9 @@
 Run this program, click the large test area, then press one physical key at a
 time.  It deliberately consumes Tab and Escape so they are recorded instead of
 moving focus or closing a window.
+
+Events are written to glove80_key_probe.log beside this file, oldest first, under
+a header naming the time the probe started.
 """
 
 from __future__ import annotations
@@ -13,12 +16,15 @@ import tkinter as tk
 from pathlib import Path
 
 
-LOG_PATH = Path(__file__).with_name("glove80-key-probe.log")
+LOG_PATH = Path(__file__).with_name("glove80_key_probe.log")
 
 
 class KeyProbe(tk.Tk):
     def __init__(self) -> None:
         super().__init__()
+        # Fixed at launch: the log header names when the probe started, which is
+        # not the time of the most recent keystroke.
+        self.started = dt.datetime.now()
         self.title("Glove80 key probe")
         self.minsize(760, 480)
         self.configure(bg="#10151f")
@@ -34,7 +40,7 @@ class KeyProbe(tk.Tk):
             self,
             text=(
                 "Click the panel below. Press one physical key at a time.\n"
-                "The newest event is logged to tools/glove80-key-probe.log."
+                "Events are appended to tools/glove80_key_probe.log, oldest first."
             ),
             font=("Helvetica", 14),
             fg="#aeb9ca",
@@ -101,10 +107,11 @@ class KeyProbe(tk.Tk):
         )
         self.latest.set(line)
         self.history.configure(state="normal")
-        self.history.insert("1.0", line + "\n")
+        self.history.insert("end", line + "\n")
+        self.history.see("end")
         self.history.configure(state="disabled")
         LOG_PATH.write_text(
-            f"# Glove80 key probe — started {dt.datetime.now().isoformat()}\n"
+            f"# Glove80 key probe — started {self.started.isoformat()}\n"
             + self.history.get("1.0", "end-1c")
             + "\n",
             encoding="utf-8",
