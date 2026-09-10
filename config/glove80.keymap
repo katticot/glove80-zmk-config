@@ -26,13 +26,7 @@
 
 #pragma once
 
-#define ZMK_HELPER_STRINGIFY(x) #x
 
-// Preprocessor mechanism to overload macros, cf. https://stackoverflow.com/a/27051616/6114651
-#define VARGS_(_10, _9, _8, _7, _6, _5, _4, _3, _2, _1, N, ...) N
-#define VARGS(...) VARGS_(__VA_ARGS__, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
-#define CONCAT_(a, b) a##b
-#define CONCAT(a, b) CONCAT_(a, b)
 
 #define ZMK_BEHAVIOR_CORE_tap_dance  \
     compatible = "zmk,behavior-tap-dance"; \
@@ -53,12 +47,7 @@
         bindings = <&mo layer>, <&to layer>; \
 )
 
-/* Environment and metadata defines */
-#define KB_TYPE_GLOVE_80 1
-#define KB_TYPE_GO_60    2
 
-#define KB_TYPE          KB_TYPE_GLOVE_80
-#define EDITOR_HOST_OS   'M'
 
 /* Automatically generated layer name defines */
 #define LAYER_ColemakDHm 0
@@ -230,86 +219,16 @@
 
 /* Key positions */
 
-#define POS_LH_C6R1 0
-#define POS_LH_C5R1 1
-#define POS_LH_C4R1 2
-#define POS_LH_C3R1 3
-#define POS_LH_C2R1 4
-#define POS_RH_C2R1 5
-#define POS_RH_C3R1 6
-#define POS_RH_C4R1 7
-#define POS_RH_C5R1 8
-#define POS_RH_C6R1 9
-#define POS_LH_C6R2 10
-#define POS_LH_C5R2 11
-#define POS_LH_C4R2 12
-#define POS_LH_C3R2 13
-#define POS_LH_C2R2 14
-#define POS_LH_C1R2 15
-#define POS_RH_C1R2 16
-#define POS_RH_C2R2 17
-#define POS_RH_C3R2 18
-#define POS_RH_C4R2 19
-#define POS_RH_C5R2 20
-#define POS_RH_C6R2 21
-#define POS_LH_C6R3 22
-#define POS_LH_C5R3 23
-#define POS_LH_C4R3 24
-#define POS_LH_C3R3 25
-#define POS_LH_C2R3 26
-#define POS_LH_C1R3 27
-#define POS_RH_C1R3 28
-#define POS_RH_C2R3 29
-#define POS_RH_C3R3 30
-#define POS_RH_C4R3 31
-#define POS_RH_C5R3 32
-#define POS_RH_C6R3 33
-#define POS_LH_C6R4 34
-#define POS_LH_C5R4 35
-#define POS_LH_C4R4 36
-#define POS_LH_C3R4 37
 #define POS_LH_C2R4 38
-#define POS_LH_C1R4 39
-#define POS_RH_C1R4 40
 #define POS_RH_C2R4 41
-#define POS_RH_C3R4 42
-#define POS_RH_C4R4 43
-#define POS_RH_C5R4 44
-#define POS_RH_C6R4 45
-#define POS_LH_C6R5 46
-#define POS_LH_C5R5 47
-#define POS_LH_C4R5 48
-#define POS_LH_C3R5 49
-#define POS_LH_C2R5 50
-#define POS_LH_C1R5 51
 #define POS_LH_T1 52
-#define POS_LH_T2 53
 #define POS_LH_T3 54
-#define POS_RH_T3 55
-#define POS_RH_T2 56
 #define POS_RH_T1 57
-#define POS_RH_C1R5 58
-#define POS_RH_C2R5 59
-#define POS_RH_C3R5 60
-#define POS_RH_C4R5 61
-#define POS_RH_C5R5 62
-#define POS_RH_C6R5 63
-#define POS_LH_C6R6 64
-#define POS_LH_C5R6 65
-#define POS_LH_C4R6 66
-#define POS_LH_C3R6 67
-#define POS_LH_C2R6 68
 #define POS_LH_T4 69
 #define POS_LH_T5 70
 #define POS_LH_T6 71
-#define POS_RH_T6 72
 #define POS_RH_T5 73
 #define POS_RH_T4 74
-#define POS_RH_C2R6 75
-#define POS_RH_C3R6 76
-#define POS_RH_C4R6 77
-#define POS_RH_C5R6 78
-#define POS_RH_C6R6 79
 
 
 /* Custom Defined Behaviors */
@@ -346,11 +265,6 @@
 // which lets you type Unicode characters via hexadecimal codepoints.
 //
 #define MACOS_USE_GACS
-#ifndef OPERATING_SYSTEM
-//#define OPERATING_SYSTEM 'L' // linux
-#define OPERATING_SYSTEM 'M' // macos
-//#define OPERATING_SYSTEM 'W' // windows
-#endif
 #if OPERATING_SYSTEM == 'M'
     #define _C      LG
     #define _A_TAB  LGUI
@@ -2932,17 +2846,6 @@ behaviors {
     #ifndef LEFT_RING1_PINKY_REPEAT_DECAY
     #define LEFT_RING1_PINKY_REPEAT_DECAY LEFT_RING1_CHORD_REPEAT_DECAY
     #endif
-    left_ring1_pinky: homey_left_ring1_pinky {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = LEFT_RING1_HOLDING_TYPE;
-        hold-trigger-key-positions = <RIGHT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <LEFT_RING1_HOLDING_TIME>;
-        quick-tap-ms = <LEFT_RING1_REPEAT_DECAY>;
-        require-prior-idle-ms = <LEFT_RING1_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     left_ring1_pinky_bilateral: homey_left_ring1_pinky_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = LEFT_RING1_HOLDING_TYPE;
@@ -2967,17 +2870,6 @@ behaviors {
     #ifndef LEFT_RING2_PINKY_REPEAT_DECAY
     #define LEFT_RING2_PINKY_REPEAT_DECAY LEFT_RING2_CHORD_REPEAT_DECAY
     #endif
-    left_ring2_pinky: homey_left_ring2_pinky {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = LEFT_RING2_HOLDING_TYPE;
-        hold-trigger-key-positions = <RIGHT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <LEFT_RING2_HOLDING_TIME>;
-        quick-tap-ms = <LEFT_RING2_REPEAT_DECAY>;
-        require-prior-idle-ms = <LEFT_RING2_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     left_ring2_pinky_bilateral: homey_left_ring2_pinky_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = LEFT_RING2_HOLDING_TYPE;
@@ -3002,17 +2894,6 @@ behaviors {
     #ifndef LEFT_MIDDY_PINKY_REPEAT_DECAY
     #define LEFT_MIDDY_PINKY_REPEAT_DECAY LEFT_MIDDY_CHORD_REPEAT_DECAY
     #endif
-    left_middy_pinky: homey_left_middy_pinky {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = LEFT_MIDDY_HOLDING_TYPE;
-        hold-trigger-key-positions = <RIGHT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <LEFT_MIDDY_HOLDING_TIME>;
-        quick-tap-ms = <LEFT_MIDDY_REPEAT_DECAY>;
-        require-prior-idle-ms = <LEFT_MIDDY_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     left_middy_pinky_bilateral: homey_left_middy_pinky_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = LEFT_MIDDY_HOLDING_TYPE;
@@ -3037,17 +2918,6 @@ behaviors {
     #ifndef LEFT_INDEX_PINKY_REPEAT_DECAY
     #define LEFT_INDEX_PINKY_REPEAT_DECAY LEFT_INDEX_CHORD_REPEAT_DECAY
     #endif
-    left_index_pinky: homey_left_index_pinky {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = LEFT_INDEX_HOLDING_TYPE;
-        hold-trigger-key-positions = <RIGHT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <LEFT_INDEX_HOLDING_TIME>;
-        quick-tap-ms = <LEFT_INDEX_REPEAT_DECAY>;
-        require-prior-idle-ms = <LEFT_INDEX_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     left_index_pinky_bilateral: homey_left_index_pinky_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = LEFT_INDEX_HOLDING_TYPE;
@@ -3072,17 +2942,6 @@ behaviors {
     #ifndef RIGHT_RING1_PINKY_REPEAT_DECAY
     #define RIGHT_RING1_PINKY_REPEAT_DECAY RIGHT_RING1_CHORD_REPEAT_DECAY
     #endif
-    right_ring1_pinky: homey_right_ring1_pinky {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = RIGHT_RING1_HOLDING_TYPE;
-        hold-trigger-key-positions = <LEFT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <RIGHT_RING1_HOLDING_TIME>;
-        quick-tap-ms = <RIGHT_RING1_REPEAT_DECAY>;
-        require-prior-idle-ms = <RIGHT_RING1_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     right_ring1_pinky_bilateral: homey_right_ring1_pinky_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = RIGHT_RING1_HOLDING_TYPE;
@@ -3107,17 +2966,6 @@ behaviors {
     #ifndef RIGHT_RING2_PINKY_REPEAT_DECAY
     #define RIGHT_RING2_PINKY_REPEAT_DECAY RIGHT_RING2_CHORD_REPEAT_DECAY
     #endif
-    right_ring2_pinky: homey_right_ring2_pinky {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = RIGHT_RING2_HOLDING_TYPE;
-        hold-trigger-key-positions = <LEFT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <RIGHT_RING2_HOLDING_TIME>;
-        quick-tap-ms = <RIGHT_RING2_REPEAT_DECAY>;
-        require-prior-idle-ms = <RIGHT_RING2_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     right_ring2_pinky_bilateral: homey_right_ring2_pinky_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = RIGHT_RING2_HOLDING_TYPE;
@@ -3142,17 +2990,6 @@ behaviors {
     #ifndef RIGHT_MIDDY_PINKY_REPEAT_DECAY
     #define RIGHT_MIDDY_PINKY_REPEAT_DECAY RIGHT_MIDDY_CHORD_REPEAT_DECAY
     #endif
-    right_middy_pinky: homey_right_middy_pinky {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = RIGHT_MIDDY_HOLDING_TYPE;
-        hold-trigger-key-positions = <LEFT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <RIGHT_MIDDY_HOLDING_TIME>;
-        quick-tap-ms = <RIGHT_MIDDY_REPEAT_DECAY>;
-        require-prior-idle-ms = <RIGHT_MIDDY_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     right_middy_pinky_bilateral: homey_right_middy_pinky_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = RIGHT_MIDDY_HOLDING_TYPE;
@@ -3177,17 +3014,6 @@ behaviors {
     #ifndef RIGHT_INDEX_PINKY_REPEAT_DECAY
     #define RIGHT_INDEX_PINKY_REPEAT_DECAY RIGHT_INDEX_CHORD_REPEAT_DECAY
     #endif
-    right_index_pinky: homey_right_index_pinky {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = RIGHT_INDEX_HOLDING_TYPE;
-        hold-trigger-key-positions = <LEFT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <RIGHT_INDEX_HOLDING_TIME>;
-        quick-tap-ms = <RIGHT_INDEX_REPEAT_DECAY>;
-        require-prior-idle-ms = <RIGHT_INDEX_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     right_index_pinky_bilateral: homey_right_index_pinky_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = RIGHT_INDEX_HOLDING_TYPE;
@@ -3212,17 +3038,6 @@ behaviors {
     #ifndef LEFT_PINKY_RING1_REPEAT_DECAY
     #define LEFT_PINKY_RING1_REPEAT_DECAY LEFT_PINKY_CHORD_REPEAT_DECAY
     #endif
-    left_pinky_ring1: homey_left_pinky_ring1 {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = LEFT_PINKY_HOLDING_TYPE;
-        hold-trigger-key-positions = <RIGHT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <LEFT_PINKY_HOLDING_TIME>;
-        quick-tap-ms = <LEFT_PINKY_REPEAT_DECAY>;
-        require-prior-idle-ms = <LEFT_PINKY_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     left_pinky_ring1_bilateral: homey_left_pinky_ring1_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = LEFT_PINKY_HOLDING_TYPE;
@@ -3247,17 +3062,6 @@ behaviors {
     #ifndef LEFT_RING2_RING1_REPEAT_DECAY
     #define LEFT_RING2_RING1_REPEAT_DECAY LEFT_RING2_CHORD_REPEAT_DECAY
     #endif
-    left_ring2_ring1: homey_left_ring2_ring1 {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = LEFT_RING2_HOLDING_TYPE;
-        hold-trigger-key-positions = <RIGHT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <LEFT_RING2_HOLDING_TIME>;
-        quick-tap-ms = <LEFT_RING2_REPEAT_DECAY>;
-        require-prior-idle-ms = <LEFT_RING2_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     left_ring2_ring1_bilateral: homey_left_ring2_ring1_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = LEFT_RING2_HOLDING_TYPE;
@@ -3282,17 +3086,6 @@ behaviors {
     #ifndef LEFT_MIDDY_RING1_REPEAT_DECAY
     #define LEFT_MIDDY_RING1_REPEAT_DECAY LEFT_MIDDY_CHORD_REPEAT_DECAY
     #endif
-    left_middy_ring1: homey_left_middy_ring1 {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = LEFT_MIDDY_HOLDING_TYPE;
-        hold-trigger-key-positions = <RIGHT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <LEFT_MIDDY_HOLDING_TIME>;
-        quick-tap-ms = <LEFT_MIDDY_REPEAT_DECAY>;
-        require-prior-idle-ms = <LEFT_MIDDY_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     left_middy_ring1_bilateral: homey_left_middy_ring1_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = LEFT_MIDDY_HOLDING_TYPE;
@@ -3317,17 +3110,6 @@ behaviors {
     #ifndef LEFT_INDEX_RING1_REPEAT_DECAY
     #define LEFT_INDEX_RING1_REPEAT_DECAY LEFT_INDEX_CHORD_REPEAT_DECAY
     #endif
-    left_index_ring1: homey_left_index_ring1 {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = LEFT_INDEX_HOLDING_TYPE;
-        hold-trigger-key-positions = <RIGHT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <LEFT_INDEX_HOLDING_TIME>;
-        quick-tap-ms = <LEFT_INDEX_REPEAT_DECAY>;
-        require-prior-idle-ms = <LEFT_INDEX_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     left_index_ring1_bilateral: homey_left_index_ring1_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = LEFT_INDEX_HOLDING_TYPE;
@@ -3352,17 +3134,6 @@ behaviors {
     #ifndef RIGHT_PINKY_RING1_REPEAT_DECAY
     #define RIGHT_PINKY_RING1_REPEAT_DECAY RIGHT_PINKY_CHORD_REPEAT_DECAY
     #endif
-    right_pinky_ring1: homey_right_pinky_ring1 {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = RIGHT_PINKY_HOLDING_TYPE;
-        hold-trigger-key-positions = <LEFT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <RIGHT_PINKY_HOLDING_TIME>;
-        quick-tap-ms = <RIGHT_PINKY_REPEAT_DECAY>;
-        require-prior-idle-ms = <RIGHT_PINKY_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     right_pinky_ring1_bilateral: homey_right_pinky_ring1_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = RIGHT_PINKY_HOLDING_TYPE;
@@ -3387,17 +3158,6 @@ behaviors {
     #ifndef RIGHT_RING2_RING1_REPEAT_DECAY
     #define RIGHT_RING2_RING1_REPEAT_DECAY RIGHT_RING2_CHORD_REPEAT_DECAY
     #endif
-    right_ring2_ring1: homey_right_ring2_ring1 {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = RIGHT_RING2_HOLDING_TYPE;
-        hold-trigger-key-positions = <LEFT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <RIGHT_RING2_HOLDING_TIME>;
-        quick-tap-ms = <RIGHT_RING2_REPEAT_DECAY>;
-        require-prior-idle-ms = <RIGHT_RING2_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     right_ring2_ring1_bilateral: homey_right_ring2_ring1_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = RIGHT_RING2_HOLDING_TYPE;
@@ -3422,17 +3182,6 @@ behaviors {
     #ifndef RIGHT_MIDDY_RING1_REPEAT_DECAY
     #define RIGHT_MIDDY_RING1_REPEAT_DECAY RIGHT_MIDDY_CHORD_REPEAT_DECAY
     #endif
-    right_middy_ring1: homey_right_middy_ring1 {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = RIGHT_MIDDY_HOLDING_TYPE;
-        hold-trigger-key-positions = <LEFT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <RIGHT_MIDDY_HOLDING_TIME>;
-        quick-tap-ms = <RIGHT_MIDDY_REPEAT_DECAY>;
-        require-prior-idle-ms = <RIGHT_MIDDY_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     right_middy_ring1_bilateral: homey_right_middy_ring1_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = RIGHT_MIDDY_HOLDING_TYPE;
@@ -3457,17 +3206,6 @@ behaviors {
     #ifndef RIGHT_INDEX_RING1_REPEAT_DECAY
     #define RIGHT_INDEX_RING1_REPEAT_DECAY RIGHT_INDEX_CHORD_REPEAT_DECAY
     #endif
-    right_index_ring1: homey_right_index_ring1 {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = RIGHT_INDEX_HOLDING_TYPE;
-        hold-trigger-key-positions = <LEFT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <RIGHT_INDEX_HOLDING_TIME>;
-        quick-tap-ms = <RIGHT_INDEX_REPEAT_DECAY>;
-        require-prior-idle-ms = <RIGHT_INDEX_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     right_index_ring1_bilateral: homey_right_index_ring1_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = RIGHT_INDEX_HOLDING_TYPE;
@@ -3492,17 +3230,6 @@ behaviors {
     #ifndef LEFT_PINKY_RING2_REPEAT_DECAY
     #define LEFT_PINKY_RING2_REPEAT_DECAY LEFT_PINKY_CHORD_REPEAT_DECAY
     #endif
-    left_pinky_ring2: homey_left_pinky_ring2 {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = LEFT_PINKY_HOLDING_TYPE;
-        hold-trigger-key-positions = <RIGHT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <LEFT_PINKY_HOLDING_TIME>;
-        quick-tap-ms = <LEFT_PINKY_REPEAT_DECAY>;
-        require-prior-idle-ms = <LEFT_PINKY_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     left_pinky_ring2_bilateral: homey_left_pinky_ring2_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = LEFT_PINKY_HOLDING_TYPE;
@@ -3527,17 +3254,6 @@ behaviors {
     #ifndef LEFT_RING1_RING2_REPEAT_DECAY
     #define LEFT_RING1_RING2_REPEAT_DECAY LEFT_RING1_CHORD_REPEAT_DECAY
     #endif
-    left_ring1_ring2: homey_left_ring1_ring2 {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = LEFT_RING1_HOLDING_TYPE;
-        hold-trigger-key-positions = <RIGHT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <LEFT_RING1_HOLDING_TIME>;
-        quick-tap-ms = <LEFT_RING1_REPEAT_DECAY>;
-        require-prior-idle-ms = <LEFT_RING1_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     left_ring1_ring2_bilateral: homey_left_ring1_ring2_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = LEFT_RING1_HOLDING_TYPE;
@@ -3562,17 +3278,6 @@ behaviors {
     #ifndef LEFT_MIDDY_RING2_REPEAT_DECAY
     #define LEFT_MIDDY_RING2_REPEAT_DECAY LEFT_MIDDY_CHORD_REPEAT_DECAY
     #endif
-    left_middy_ring2: homey_left_middy_ring2 {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = LEFT_MIDDY_HOLDING_TYPE;
-        hold-trigger-key-positions = <RIGHT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <LEFT_MIDDY_HOLDING_TIME>;
-        quick-tap-ms = <LEFT_MIDDY_REPEAT_DECAY>;
-        require-prior-idle-ms = <LEFT_MIDDY_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     left_middy_ring2_bilateral: homey_left_middy_ring2_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = LEFT_MIDDY_HOLDING_TYPE;
@@ -3597,17 +3302,6 @@ behaviors {
     #ifndef LEFT_INDEX_RING2_REPEAT_DECAY
     #define LEFT_INDEX_RING2_REPEAT_DECAY LEFT_INDEX_CHORD_REPEAT_DECAY
     #endif
-    left_index_ring2: homey_left_index_ring2 {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = LEFT_INDEX_HOLDING_TYPE;
-        hold-trigger-key-positions = <RIGHT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <LEFT_INDEX_HOLDING_TIME>;
-        quick-tap-ms = <LEFT_INDEX_REPEAT_DECAY>;
-        require-prior-idle-ms = <LEFT_INDEX_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     left_index_ring2_bilateral: homey_left_index_ring2_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = LEFT_INDEX_HOLDING_TYPE;
@@ -3632,17 +3326,6 @@ behaviors {
     #ifndef RIGHT_PINKY_RING2_REPEAT_DECAY
     #define RIGHT_PINKY_RING2_REPEAT_DECAY RIGHT_PINKY_CHORD_REPEAT_DECAY
     #endif
-    right_pinky_ring2: homey_right_pinky_ring2 {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = RIGHT_PINKY_HOLDING_TYPE;
-        hold-trigger-key-positions = <LEFT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <RIGHT_PINKY_HOLDING_TIME>;
-        quick-tap-ms = <RIGHT_PINKY_REPEAT_DECAY>;
-        require-prior-idle-ms = <RIGHT_PINKY_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     right_pinky_ring2_bilateral: homey_right_pinky_ring2_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = RIGHT_PINKY_HOLDING_TYPE;
@@ -3667,17 +3350,6 @@ behaviors {
     #ifndef RIGHT_RING1_RING2_REPEAT_DECAY
     #define RIGHT_RING1_RING2_REPEAT_DECAY RIGHT_RING1_CHORD_REPEAT_DECAY
     #endif
-    right_ring1_ring2: homey_right_ring1_ring2 {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = RIGHT_RING1_HOLDING_TYPE;
-        hold-trigger-key-positions = <LEFT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <RIGHT_RING1_HOLDING_TIME>;
-        quick-tap-ms = <RIGHT_RING1_REPEAT_DECAY>;
-        require-prior-idle-ms = <RIGHT_RING1_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     right_ring1_ring2_bilateral: homey_right_ring1_ring2_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = RIGHT_RING1_HOLDING_TYPE;
@@ -3702,17 +3374,6 @@ behaviors {
     #ifndef RIGHT_MIDDY_RING2_REPEAT_DECAY
     #define RIGHT_MIDDY_RING2_REPEAT_DECAY RIGHT_MIDDY_CHORD_REPEAT_DECAY
     #endif
-    right_middy_ring2: homey_right_middy_ring2 {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = RIGHT_MIDDY_HOLDING_TYPE;
-        hold-trigger-key-positions = <LEFT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <RIGHT_MIDDY_HOLDING_TIME>;
-        quick-tap-ms = <RIGHT_MIDDY_REPEAT_DECAY>;
-        require-prior-idle-ms = <RIGHT_MIDDY_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     right_middy_ring2_bilateral: homey_right_middy_ring2_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = RIGHT_MIDDY_HOLDING_TYPE;
@@ -3737,17 +3398,6 @@ behaviors {
     #ifndef RIGHT_INDEX_RING2_REPEAT_DECAY
     #define RIGHT_INDEX_RING2_REPEAT_DECAY RIGHT_INDEX_CHORD_REPEAT_DECAY
     #endif
-    right_index_ring2: homey_right_index_ring2 {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = RIGHT_INDEX_HOLDING_TYPE;
-        hold-trigger-key-positions = <LEFT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <RIGHT_INDEX_HOLDING_TIME>;
-        quick-tap-ms = <RIGHT_INDEX_REPEAT_DECAY>;
-        require-prior-idle-ms = <RIGHT_INDEX_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     right_index_ring2_bilateral: homey_right_index_ring2_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = RIGHT_INDEX_HOLDING_TYPE;
@@ -3772,17 +3422,6 @@ behaviors {
     #ifndef LEFT_PINKY_MIDDY_REPEAT_DECAY
     #define LEFT_PINKY_MIDDY_REPEAT_DECAY LEFT_PINKY_CHORD_REPEAT_DECAY
     #endif
-    left_pinky_middy: homey_left_pinky_middy {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = LEFT_PINKY_HOLDING_TYPE;
-        hold-trigger-key-positions = <RIGHT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <LEFT_PINKY_HOLDING_TIME>;
-        quick-tap-ms = <LEFT_PINKY_REPEAT_DECAY>;
-        require-prior-idle-ms = <LEFT_PINKY_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     left_pinky_middy_bilateral: homey_left_pinky_middy_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = LEFT_PINKY_HOLDING_TYPE;
@@ -3807,17 +3446,6 @@ behaviors {
     #ifndef LEFT_RING1_MIDDY_REPEAT_DECAY
     #define LEFT_RING1_MIDDY_REPEAT_DECAY LEFT_RING1_CHORD_REPEAT_DECAY
     #endif
-    left_ring1_middy: homey_left_ring1_middy {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = LEFT_RING1_HOLDING_TYPE;
-        hold-trigger-key-positions = <RIGHT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <LEFT_RING1_HOLDING_TIME>;
-        quick-tap-ms = <LEFT_RING1_REPEAT_DECAY>;
-        require-prior-idle-ms = <LEFT_RING1_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     left_ring1_middy_bilateral: homey_left_ring1_middy_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = LEFT_RING1_HOLDING_TYPE;
@@ -3842,17 +3470,6 @@ behaviors {
     #ifndef LEFT_RING2_MIDDY_REPEAT_DECAY
     #define LEFT_RING2_MIDDY_REPEAT_DECAY LEFT_RING2_CHORD_REPEAT_DECAY
     #endif
-    left_ring2_middy: homey_left_ring2_middy {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = LEFT_RING2_HOLDING_TYPE;
-        hold-trigger-key-positions = <RIGHT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <LEFT_RING2_HOLDING_TIME>;
-        quick-tap-ms = <LEFT_RING2_REPEAT_DECAY>;
-        require-prior-idle-ms = <LEFT_RING2_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     left_ring2_middy_bilateral: homey_left_ring2_middy_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = LEFT_RING2_HOLDING_TYPE;
@@ -3877,17 +3494,6 @@ behaviors {
     #ifndef LEFT_INDEX_MIDDY_REPEAT_DECAY
     #define LEFT_INDEX_MIDDY_REPEAT_DECAY LEFT_INDEX_CHORD_REPEAT_DECAY
     #endif
-    left_index_middy: homey_left_index_middy {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = LEFT_INDEX_HOLDING_TYPE;
-        hold-trigger-key-positions = <RIGHT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <LEFT_INDEX_HOLDING_TIME>;
-        quick-tap-ms = <LEFT_INDEX_REPEAT_DECAY>;
-        require-prior-idle-ms = <LEFT_INDEX_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     left_index_middy_bilateral: homey_left_index_middy_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = LEFT_INDEX_HOLDING_TYPE;
@@ -3912,17 +3518,6 @@ behaviors {
     #ifndef RIGHT_PINKY_MIDDY_REPEAT_DECAY
     #define RIGHT_PINKY_MIDDY_REPEAT_DECAY RIGHT_PINKY_CHORD_REPEAT_DECAY
     #endif
-    right_pinky_middy: homey_right_pinky_middy {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = RIGHT_PINKY_HOLDING_TYPE;
-        hold-trigger-key-positions = <LEFT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <RIGHT_PINKY_HOLDING_TIME>;
-        quick-tap-ms = <RIGHT_PINKY_REPEAT_DECAY>;
-        require-prior-idle-ms = <RIGHT_PINKY_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     right_pinky_middy_bilateral: homey_right_pinky_middy_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = RIGHT_PINKY_HOLDING_TYPE;
@@ -3947,17 +3542,6 @@ behaviors {
     #ifndef RIGHT_RING1_MIDDY_REPEAT_DECAY
     #define RIGHT_RING1_MIDDY_REPEAT_DECAY RIGHT_RING1_CHORD_REPEAT_DECAY
     #endif
-    right_ring1_middy: homey_right_ring1_middy {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = RIGHT_RING1_HOLDING_TYPE;
-        hold-trigger-key-positions = <LEFT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <RIGHT_RING1_HOLDING_TIME>;
-        quick-tap-ms = <RIGHT_RING1_REPEAT_DECAY>;
-        require-prior-idle-ms = <RIGHT_RING1_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     right_ring1_middy_bilateral: homey_right_ring1_middy_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = RIGHT_RING1_HOLDING_TYPE;
@@ -3982,17 +3566,6 @@ behaviors {
     #ifndef RIGHT_RING2_MIDDY_REPEAT_DECAY
     #define RIGHT_RING2_MIDDY_REPEAT_DECAY RIGHT_RING2_CHORD_REPEAT_DECAY
     #endif
-    right_ring2_middy: homey_right_ring2_middy {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = RIGHT_RING2_HOLDING_TYPE;
-        hold-trigger-key-positions = <LEFT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <RIGHT_RING2_HOLDING_TIME>;
-        quick-tap-ms = <RIGHT_RING2_REPEAT_DECAY>;
-        require-prior-idle-ms = <RIGHT_RING2_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     right_ring2_middy_bilateral: homey_right_ring2_middy_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = RIGHT_RING2_HOLDING_TYPE;
@@ -4017,17 +3590,6 @@ behaviors {
     #ifndef RIGHT_INDEX_MIDDY_REPEAT_DECAY
     #define RIGHT_INDEX_MIDDY_REPEAT_DECAY RIGHT_INDEX_CHORD_REPEAT_DECAY
     #endif
-    right_index_middy: homey_right_index_middy {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = RIGHT_INDEX_HOLDING_TYPE;
-        hold-trigger-key-positions = <LEFT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <RIGHT_INDEX_HOLDING_TIME>;
-        quick-tap-ms = <RIGHT_INDEX_REPEAT_DECAY>;
-        require-prior-idle-ms = <RIGHT_INDEX_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     right_index_middy_bilateral: homey_right_index_middy_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = RIGHT_INDEX_HOLDING_TYPE;
@@ -4052,17 +3614,6 @@ behaviors {
     #ifndef LEFT_PINKY_INDEX_REPEAT_DECAY
     #define LEFT_PINKY_INDEX_REPEAT_DECAY LEFT_PINKY_CHORD_REPEAT_DECAY
     #endif
-    left_pinky_index: homey_left_pinky_index {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = LEFT_PINKY_HOLDING_TYPE;
-        hold-trigger-key-positions = <RIGHT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <LEFT_PINKY_HOLDING_TIME>;
-        quick-tap-ms = <LEFT_PINKY_REPEAT_DECAY>;
-        require-prior-idle-ms = <LEFT_PINKY_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     left_pinky_index_bilateral: homey_left_pinky_index_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = LEFT_PINKY_HOLDING_TYPE;
@@ -4087,17 +3638,6 @@ behaviors {
     #ifndef LEFT_RING1_INDEX_REPEAT_DECAY
     #define LEFT_RING1_INDEX_REPEAT_DECAY LEFT_RING1_CHORD_REPEAT_DECAY
     #endif
-    left_ring1_index: homey_left_ring1_index {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = LEFT_RING1_HOLDING_TYPE;
-        hold-trigger-key-positions = <RIGHT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <LEFT_RING1_HOLDING_TIME>;
-        quick-tap-ms = <LEFT_RING1_REPEAT_DECAY>;
-        require-prior-idle-ms = <LEFT_RING1_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     left_ring1_index_bilateral: homey_left_ring1_index_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = LEFT_RING1_HOLDING_TYPE;
@@ -4122,17 +3662,6 @@ behaviors {
     #ifndef LEFT_RING2_INDEX_REPEAT_DECAY
     #define LEFT_RING2_INDEX_REPEAT_DECAY LEFT_RING2_CHORD_REPEAT_DECAY
     #endif
-    left_ring2_index: homey_left_ring2_index {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = LEFT_RING2_HOLDING_TYPE;
-        hold-trigger-key-positions = <RIGHT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <LEFT_RING2_HOLDING_TIME>;
-        quick-tap-ms = <LEFT_RING2_REPEAT_DECAY>;
-        require-prior-idle-ms = <LEFT_RING2_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     left_ring2_index_bilateral: homey_left_ring2_index_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = LEFT_RING2_HOLDING_TYPE;
@@ -4157,17 +3686,6 @@ behaviors {
     #ifndef LEFT_MIDDY_INDEX_REPEAT_DECAY
     #define LEFT_MIDDY_INDEX_REPEAT_DECAY LEFT_MIDDY_CHORD_REPEAT_DECAY
     #endif
-    left_middy_index: homey_left_middy_index {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = LEFT_MIDDY_HOLDING_TYPE;
-        hold-trigger-key-positions = <RIGHT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <LEFT_MIDDY_HOLDING_TIME>;
-        quick-tap-ms = <LEFT_MIDDY_REPEAT_DECAY>;
-        require-prior-idle-ms = <LEFT_MIDDY_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     left_middy_index_bilateral: homey_left_middy_index_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = LEFT_MIDDY_HOLDING_TYPE;
@@ -4192,17 +3710,6 @@ behaviors {
     #ifndef RIGHT_PINKY_INDEX_REPEAT_DECAY
     #define RIGHT_PINKY_INDEX_REPEAT_DECAY RIGHT_PINKY_CHORD_REPEAT_DECAY
     #endif
-    right_pinky_index: homey_right_pinky_index {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = RIGHT_PINKY_HOLDING_TYPE;
-        hold-trigger-key-positions = <LEFT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <RIGHT_PINKY_HOLDING_TIME>;
-        quick-tap-ms = <RIGHT_PINKY_REPEAT_DECAY>;
-        require-prior-idle-ms = <RIGHT_PINKY_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     right_pinky_index_bilateral: homey_right_pinky_index_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = RIGHT_PINKY_HOLDING_TYPE;
@@ -4227,17 +3734,6 @@ behaviors {
     #ifndef RIGHT_RING1_INDEX_REPEAT_DECAY
     #define RIGHT_RING1_INDEX_REPEAT_DECAY RIGHT_RING1_CHORD_REPEAT_DECAY
     #endif
-    right_ring1_index: homey_right_ring1_index {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = RIGHT_RING1_HOLDING_TYPE;
-        hold-trigger-key-positions = <LEFT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <RIGHT_RING1_HOLDING_TIME>;
-        quick-tap-ms = <RIGHT_RING1_REPEAT_DECAY>;
-        require-prior-idle-ms = <RIGHT_RING1_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     right_ring1_index_bilateral: homey_right_ring1_index_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = RIGHT_RING1_HOLDING_TYPE;
@@ -4262,17 +3758,6 @@ behaviors {
     #ifndef RIGHT_RING2_INDEX_REPEAT_DECAY
     #define RIGHT_RING2_INDEX_REPEAT_DECAY RIGHT_RING2_CHORD_REPEAT_DECAY
     #endif
-    right_ring2_index: homey_right_ring2_index {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = RIGHT_RING2_HOLDING_TYPE;
-        hold-trigger-key-positions = <LEFT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <RIGHT_RING2_HOLDING_TIME>;
-        quick-tap-ms = <RIGHT_RING2_REPEAT_DECAY>;
-        require-prior-idle-ms = <RIGHT_RING2_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     right_ring2_index_bilateral: homey_right_ring2_index_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = RIGHT_RING2_HOLDING_TYPE;
@@ -4297,17 +3782,6 @@ behaviors {
     #ifndef RIGHT_MIDDY_INDEX_REPEAT_DECAY
     #define RIGHT_MIDDY_INDEX_REPEAT_DECAY RIGHT_MIDDY_CHORD_REPEAT_DECAY
     #endif
-    right_middy_index: homey_right_middy_index {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = RIGHT_MIDDY_HOLDING_TYPE;
-        hold-trigger-key-positions = <LEFT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
-        tapping-term-ms = <RIGHT_MIDDY_HOLDING_TIME>;
-        quick-tap-ms = <RIGHT_MIDDY_REPEAT_DECAY>;
-        require-prior-idle-ms = <RIGHT_MIDDY_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&kp>, <&kp>;
-    };
     right_middy_index_bilateral: homey_right_middy_index_bilateral {
         compatible = "zmk,behavior-hold-tap";
         flavor = RIGHT_MIDDY_HOLDING_TYPE;
@@ -4332,26 +3806,6 @@ behaviors {
         require-prior-idle-ms = <PLAIN_STREAK_DECAY>;
         #binding-cells = <2>;
         bindings = <&mo>, <&kp>;
-        retro-tap; // tap on standalone hold
-    };
-    plain_engram_COMMA: plain_typing_layer_engram_COMMA {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = PLAIN_HOLDING_TYPE;
-        tapping-term-ms = <PLAIN_HOLDING_TIME>;
-        quick-tap-ms = <PLAIN_REPEAT_DECAY>; // enable repeat
-        require-prior-idle-ms = <PLAIN_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&mo>, <&engram_COMMA>;
-        retro-tap; // tap on standalone hold
-    };
-    plain_engram_DOT: plain_typing_layer_engram_DOT {
-        compatible = "zmk,behavior-hold-tap";
-        flavor = PLAIN_HOLDING_TYPE;
-        tapping-term-ms = <PLAIN_HOLDING_TIME>;
-        quick-tap-ms = <PLAIN_REPEAT_DECAY>; // enable repeat
-        require-prior-idle-ms = <PLAIN_STREAK_DECAY>;
-        #binding-cells = <2>;
-        bindings = <&mo>, <&engram_DOT>;
         retro-tap; // tap on standalone hold
     };
 
@@ -4400,78 +3854,6 @@ behaviors {
     // - https://engram.dev/
     // - https://sunaku.github.io/engram-keyboard-layout.html
     //
-    engram_N1: engram_shift_N1_PIPE {
-        compatible = "zmk,behavior-mod-morph";
-        #binding-cells = <0>;
-        bindings = <&kp N1>, <&kp PIPE>;
-        mods = <(MOD_LSFT|MOD_RSFT)>;
-    };
-    engram_N2: engram_shift_N2_EQUAL {
-        compatible = "zmk,behavior-mod-morph";
-        #binding-cells = <0>;
-        bindings = <&kp N2>, <&kp EQUAL>;
-        mods = <(MOD_LSFT|MOD_RSFT)>;
-    };
-    engram_N3: engram_shift_N3_TILDE {
-        compatible = "zmk,behavior-mod-morph";
-        #binding-cells = <0>;
-        bindings = <&kp N3>, <&kp TILDE>;
-        mods = <(MOD_LSFT|MOD_RSFT)>;
-    };
-    engram_N4: engram_shift_N4_PLUS {
-        compatible = "zmk,behavior-mod-morph";
-        #binding-cells = <0>;
-        bindings = <&kp N4>, <&kp PLUS>;
-        mods = <(MOD_LSFT|MOD_RSFT)>;
-    };
-    engram_N5: engram_shift_N5_LT {
-        compatible = "zmk,behavior-mod-morph";
-        #binding-cells = <0>;
-        bindings = <&kp N5>, <&kp LT>;
-        mods = <(MOD_LSFT|MOD_RSFT)>;
-    };
-    engram_N6: engram_shift_N6_GT {
-        compatible = "zmk,behavior-mod-morph";
-        #binding-cells = <0>;
-        bindings = <&kp N6>, <&kp GT>;
-        mods = <(MOD_LSFT|MOD_RSFT)>;
-    };
-    engram_N7: engram_shift_N7_CARET {
-        compatible = "zmk,behavior-mod-morph";
-        #binding-cells = <0>;
-        bindings = <&kp N7>, <&kp CARET>;
-        mods = <(MOD_LSFT|MOD_RSFT)>;
-    };
-    engram_N8: engram_shift_N8_AMPS {
-        compatible = "zmk,behavior-mod-morph";
-        #binding-cells = <0>;
-        bindings = <&kp N8>, <&kp AMPS>;
-        mods = <(MOD_LSFT|MOD_RSFT)>;
-    };
-    engram_N9: engram_shift_N9_PRCNT {
-        compatible = "zmk,behavior-mod-morph";
-        #binding-cells = <0>;
-        bindings = <&kp N9>, <&kp PRCNT>;
-        mods = <(MOD_LSFT|MOD_RSFT)>;
-    };
-    engram_N0: engram_shift_N0_STAR {
-        compatible = "zmk,behavior-mod-morph";
-        #binding-cells = <0>;
-        bindings = <&kp N0>, <&kp STAR>;
-        mods = <(MOD_LSFT|MOD_RSFT)>;
-    };
-    engram_SQT: engram_shift_SQT_LPAR {
-        compatible = "zmk,behavior-mod-morph";
-        #binding-cells = <0>;
-        bindings = <&kp SQT>, <&kp LPAR>;
-        mods = <(MOD_LSFT|MOD_RSFT)>;
-    };
-    engram_DQT: engram_shift_DQT_RPAR {
-        compatible = "zmk,behavior-mod-morph";
-        #binding-cells = <0>;
-        bindings = <&kp DQT>, <&kp RPAR>;
-        mods = <(MOD_LSFT|MOD_RSFT)>;
-    };
     engram_COMMA: engram_shift_COMMA_SEMI {
         compatible = "zmk,behavior-mod-morph";
         #binding-cells = <0>;
@@ -4482,30 +3864,6 @@ behaviors {
         compatible = "zmk,behavior-mod-morph";
         #binding-cells = <0>;
         bindings = <&kp DOT>, <&kp COLON>;
-        mods = <(MOD_LSFT|MOD_RSFT)>;
-    };
-    engram_QMARK: engram_shift_QMARK_EXCL {
-        compatible = "zmk,behavior-mod-morph";
-        #binding-cells = <0>;
-        bindings = <&kp QMARK>, <&kp EXCL>;
-        mods = <(MOD_LSFT|MOD_RSFT)>;
-    };
-    engram_HASH: engram_shift_HASH_DLLR {
-        compatible = "zmk,behavior-mod-morph";
-        #binding-cells = <0>;
-        bindings = <&kp HASH>, <&kp DLLR>;
-        mods = <(MOD_LSFT|MOD_RSFT)>;
-    };
-    engram_AT: engram_shift_AT_GRAVE {
-        compatible = "zmk,behavior-mod-morph";
-        #binding-cells = <0>;
-        bindings = <&kp AT>, <&kp GRAVE>;
-        mods = <(MOD_LSFT|MOD_RSFT)>;
-    };
-    engram_FSLH: engram_shift_FSLH_BSLH {
-        compatible = "zmk,behavior-mod-morph";
-        #binding-cells = <0>;
-        bindings = <&kp FSLH>, <&kp BSLH>;
         mods = <(MOD_LSFT|MOD_RSFT)>;
     };
 
