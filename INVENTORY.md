@@ -10,6 +10,9 @@ This repository is the single source of truth for this Glove80 configuration.
 | `docs/glove80.html` | Interactive Field Guide, generated from `config/glove80.keymap`. |
 | `docs/glove80-before-after.html` | Before/after key diff between two revisions of the keymap. Regenerate with `python3 tools/make_before_after.py --before <rev>`. |
 | `docs/reference/` | Personal guide, layer reference, historical layout snapshots, and live v38 verification notes. |
+| `tools/generate_field_guide.py` | Builds `docs/glove80.html`; `--check` fails if it is stale or the mirror disagrees. |
+| `tools/make_before_after.py` | Builds `docs/glove80-before-after.html` from two revisions of the keymap. |
+| `tools/glove80_key_probe.py` | macOS window that logs what a physical key actually sends, to `tools/glove80-key-probe.log`. Evidence for `docs/reference/v38-live-key-verification.md`. |
 | `archive/keymaps/` | Earlier standalone keymap snapshot. |
 | `archive/layouts/` | Pre-Field-Guide layout inspector snapshot. |
 | `artifacts/firmware/glove80-current.uf2` | The current build: 18 layers, macOS. |
