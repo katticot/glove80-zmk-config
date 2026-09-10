@@ -1,6 +1,6 @@
 /*
  * MoErgo Glove80 Clean Minimal Keymap (Colemak-DH + Bilateral HRM + Numpad/Nav + Magic)
- * Authentic Colemak-DH Alpha Mapping & MoErgo Matrix Order
+ * Custom Thumb Bindings: 73 = Enter, 72 = Tab, 74 = Backspace
  */
 
 #include <behaviors.dtsi>
@@ -188,9 +188,13 @@
             // 34..45: Home Row (12 keys: Colemak-DH A R S T G | M N E I O ;)
             &kp ESC        &lh_p_alt LALT A   &lh_r_gui LGUI R   &lh_m_ctl LCTRL S   &lh_i_sft LSHIFT T  &kp G                                                                                      &kp M       &rh_i_sft RSHIFT N  &rh_m_ctl RCTRL E  &rh_r_gui RGUI I   &rh_p_alt RALT O   &kp SEMI
             // 46..63: Bottom Row Alphas (6 LH: ` Z X C D V) + Upper Thumbs (3 LH + 3 RH) + Bottom Row Alphas (6 RH: K H , . / +) = 18 keys
-            &kp GRAVE      &kp Z              &kp X              &kp C               &kp D               &kp V   &kp ESC     &lt_tab_num NUMNAV TAB &kp END     &kp SPACE &kp DEL   &kp RCTRL      &kp K       &kp H               &kp COMMA          &kp DOT            &kp FSLH           &kp PLUS
+            // LH Upper Thumbs (52, 53, 54): [52: Esc] [53 (Pos 73): Enter/L1] [54: End]
+            // RH Upper Thumbs (55, 56, 57): [55: Space] [56: Del] [57: RCtrl]
+            &kp GRAVE      &kp Z              &kp X              &kp C               &kp D               &kp V   &kp ESC     &lt_ent_num NUMNAV RET &kp END     &kp SPACE &kp DEL   &kp RCTRL      &kp K       &kp H               &kp COMMA          &kp DOT            &kp FSLH           &kp PLUS
             // 64..79: LH Magic (Pos 64) + LH Reach (4 keys) + Lower Thumbs (3 LH + 3 RH) + RH Reach (5 keys) = 16 keys
-            &magic MAGIC 0 &kp HOME           &kp END            &kp LEFT            &kp RIGHT                   &kp SPACE   &kp BSPC               &lt_ent_num NUMNAV RET &kp RET &kp RALT &kp RGUI           &kp UP              &kp DOWN           &kp LBKT           &kp RBKT           &kp PG_DN
+            // LH Lower Thumbs (69, 70, 71): [69: Space] [70: BkSp] [71 (Pos 74): BkSp/L1]
+            // RH Lower Thumbs (72, 73, 74): [72 (Pos 72): Tab/L1] [73: Alt] [74: RGui]
+            &magic MAGIC 0 &kp HOME           &kp END            &kp LEFT            &kp RIGHT                   &kp SPACE   &kp BSPC               &kp BSPC    &lt_tab_num NUMNAV TAB &kp RALT &kp RGUI   &kp UP              &kp DOWN           &kp LBKT           &kp RBKT           &kp PG_DN
             >;
         };
 
@@ -207,7 +211,7 @@
             // 46..63: Bottom + Upper Thumbs
             &trans        &kp TILDE          &kp UNDER          &kp PLUS            &kp LBRC            &kp RBRC  &trans    &trans                 &trans      &kp KP_N0 &kp KP_DOT &kp KP_ENTER   &kp KP_N1   &kp KP_N2           &kp KP_N3          &kp KP_DOT         &kp KP_SLASH       &trans
             // 64..79: Magic + Reach + Lower Thumbs
-            &trans        &trans             &trans             &trans              &trans                        &trans    &trans                 &trans      &kp RET   &trans     &trans                     &kp HOME            &kp END            &kp LEFT           &kp RIGHT          &kp PG_UP
+            &trans        &trans             &trans             &trans              &trans                        &trans    &trans                 &trans      &trans    &trans     &trans                     &kp HOME            &kp END            &kp LEFT           &kp RIGHT          &kp PG_UP
             >;
         };
 
