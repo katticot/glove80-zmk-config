@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Glove80 Studio — Interactive Firmware & Layout Inspector</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070A10;
+      --bg-panel: #0D121F;
+      --bg-card: #131B2E;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-bright: rgba(56, 189, 248, 0.3);
+      
+      --cyan: #38BDF8;
+      --emerald: #34D399;
+      --purple: #A78BFA;
+      --amber: #FBBF24;
+      --rose: #FB7185;
+      
+      --cap-top: #FFFFFF;
+      --cap-btm: #E2E8F0;
+      --cap-border: #CBD5E1;
+      --cap-text: #0F172A;
+      --cap-sub: #6366F1;
+      --cap-shift: #0284C7;
+      
+      --font-ui: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'Fira Code', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: radial-gradient(circle at 50% 0%, #111A2E 0%, var(--bg) 75%);
+      color: #F1F5F9;
+      font-family: var(--font-ui);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      user-select: none;
+    }
+
+    /* Top Studio Header */
+    header {
+      background: rgba(10, 15, 26, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      z-index: 100;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-badge {
+      background: linear-gradient(135deg, #0284C7, #8B5CF6);
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.9rem;
+      padding: 0.3rem 0.6rem;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(2, 132, 199, 0.4);
+    }
+
+    .brand-text h1 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .brand-text p {
+      font-size: 0.75rem;
+      color: #64748B;
+    }
+
+    .top-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-pill {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: #94A3B8;
+      padding: 0.35rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: all 0.15s;
+    }
+
+    .btn-pill:hover {
+      color: #fff;
+      border-color: var(--cyan);
+    }
+
+    .btn-pill.active {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+
+    /* Layer Tabs Bar */
+    .layer-strip {
+      background: #090E18;
+      border-bottom: 1px solid var(--border);
+      padding: 0.45rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      overflow-x: auto;
+    }
+
+    .layer-tab {
+      background: #101626;
+      border: 1px solid var(--border);
+      color: #94A3B8;
+      padding: 0.35rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+
+    .layer-tab:hover {
+      background: #182238;
+      color: #fff;
+    }
+
+    .layer-tab.active {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(167, 139, 250, 0.2));
+      border-color: var(--cyan);
+      color: #fff;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+    }
+
+    .layer-tab .l-idx {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--cyan);
+      background: rgba(0,0,0,0.4);
+      padding: 0.1rem 0.3rem;
+      border-radius: 4px;
+    }
+
+    .live-indicator {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--cyan);
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid var(--border-bright);
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+    }
+
+    .dot-pulse {
+      width: 7px;
+      height: 7px;
+      background: var(--emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--emerald);
+    }
+
+    /* Main Studio Grid (Split: Board on Left, Dock on Right) */
+    .studio-layout {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 1.25rem;
+      padding: 1.25rem 1.5rem;
+      max-width: 1800px;
+      margin: 0 auto;
+      width: 100%;
+      align-items: start;
+    }
+
+    @media (max-width: 1200px) {
+      .studio-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Left Stage: Keyboard Chassis */
+    .keyboard-stage {
+      background: radial-gradient(ellipse at 50% 25%, #131C2E 0%, #0B101D 100%);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 1.5rem 1rem 2rem;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+      position: relative;
+    }
+
+    .layer-heading {
+      text-align: center;
+    }
+
+    .layer-heading h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .layer-heading p {
+      font-size: 0.8rem;
+      color: #94A3B8;
+      margin-top: 0.2rem;
+    }
+
+    /* Split Keyboard Halves */
+    .split-board {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+
+    .glove-half {
+      background: linear-gradient(180deg, #121826 0%, #0A0F19 100%);
+      border: 1.5px solid #222E46;
+      border-radius: 28px;
+      padding: 1.25rem 1.25rem 1.5rem;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    .half-label {
+      text-align: center;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--cyan);
+      opacity: 0.9;
+    }
+
+    .concave-matrix {
+      background: radial-gradient(ellipse at 50% 50%, #0A0F1A 0%, #121A29 100%);
+      border-radius: 18px;
+      padding: 0.75rem 0.6rem;
+      border: 1px solid rgba(255,255,255,0.04);
+      box-shadow: inset 0 6px 14px rgba(0,0,0,0.7);
+      display: flex;
+      gap: 0.35rem;
+    }
+
+    .col-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    /* Stagger Offsets */
+    .stg-pinky-ext { margin-top: 20px; }
+    .stg-pinky     { margin-top: 10px; }
+    .stg-ring      { margin-top: 0px;  }
+    .stg-mid       { margin-top: -6px; }
+    .stg-idx       { margin-top: 8px;  }
+    .stg-inner     { margin-top: 44px; }
+
+    /* Keycap Design */
+    .keycap {
+      width: 46px;
+      height: 42px;
+      background: linear-gradient(180deg, var(--cap-top) 0%, var(--cap-btm) 100%);
+      border: 1px solid var(--cap-border);
+      border-bottom: 2.5px solid #94A3B8;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 0.25rem 0.3rem;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35), inset 0 1px 0 #FFFFFF;
+      cursor: pointer;
+      transition: transform 0.08s, box-shadow 0.08s, border-color 0.08s;
+      position: relative;
+    }
+
+    .keycap:hover {
+      transform: translateY(-2px);
+      border-color: var(--cyan);
+      box-shadow: 0 5px 12px rgba(56, 189, 248, 0.4);
+      z-index: 10;
+    }
+
+    .keycap.pressed, .keycap.hw-pressed {
+      transform: translateY(2px) scale(0.96) !important;
+      border-bottom: 1px solid #94A3B8 !important;
+      background: #E2E8F0 !important;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.8) !important;
+      border-color: var(--cyan) !important;
+    }
+
+    .keycap.hw-tested::before {
+      content: '';
+      position: absolute;
+      top: 2.5px;
+      right: 2.5px;
+      width: 4px;
+      height: 4px;
+      background: var(--emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 4px var(--emerald);
+    }
+
+    /* Home Row Bar */
+    .keycap.home-row {
+      border-bottom: 2.5px solid var(--cap-sub);
+    }
+
+    .keycap.home-row::after {
+      content: '';
+      position: absolute;
+      bottom: 2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 12px;
+      height: 2px;
+      background: var(--cap-sub);
+      border-radius: 1px;
+    }
+
+    /* Key Typography */
+    .cap-shift {
+      font-size: 0.62rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--cap-shift);
+      line-height: 1;
+      height: 8px;
+    }
+
+    .cap-main {
+      font-size: 0.82rem;
+      font-family: var(--font-ui);
+      font-weight: 800;
+      color: var(--cap-text);
+      text-align: center;
+      line-height: 1.1;
+      margin: auto 0;
+    }
+
+    .cap-sub {
+      font-size: 0.55rem;
+      font-family: var(--font-ui);
+      font-weight: 700;
+      color: var(--cap-sub);
+      text-align: right;
+      line-height: 1;
+      height: 8px;
+      text-transform: uppercase;
+    }
+
+    /* 6-Key Curved Thumb Wings */
+    .thumb-cluster {
+      background: linear-gradient(135deg, #0E1422 0%, #080C16 100%);
+      border: 1.5px solid #222E46;
+      border-radius: 20px;
+      padding: 0.65rem 0.6rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+      display: grid;
+      grid-template-columns: repeat(3, 46px);
+      grid-template-rows: repeat(2, 42px);
+      gap: 0.35rem;
+    }
+
+    .thumb-cluster.left-wing {
+      margin-left: 70px;
+      transform: rotate(-10deg);
+    }
+
+    .thumb-cluster.right-wing {
+      margin-right: 70px;
+      transform: rotate(10deg);
+      align-self: flex-end;
+    }
+
+    .thumb-cluster .keycap.space-key {
+      background: linear-gradient(180deg, #F0F9FF 0%, #BAE6FD 100%);
+      border-color: #7DD3FC;
+      border-bottom-color: #38BDF8;
+    }
+
+    .thumb-cluster .keycap.space-key .cap-main {
+      color: #0369A1;
+      font-weight: 800;
+    }
+
+    /* Right Dock: Live Studio Telemetry Panel */
+    .studio-dock {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .dock-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.1rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .card-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #94A3B8;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Live Key Spotlight */
+    .spotlight-box {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border-bright);
+      border-radius: 12px;
+      padding: 0.85rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .spotlight-key {
+      font-family: var(--font-mono);
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--cyan);
+    }
+
+    .spotlight-meta {
+      text-align: right;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: #94A3B8;
+    }
+
+    /* Modifiers Indicator */
+    .mod-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.35rem;
+    }
+
+    .mod-pill {
+      background: #141B2D;
+      border: 1px solid var(--border);
+      color: #475569;
+      padding: 0.35rem;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-align: center;
+      transition: all 0.1s;
+    }
+
+    .mod-pill.active {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: var(--cyan);
+      color: var(--cyan);
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.3);
+    }
+
+    /* Live Typing Sandbox */
+    .sandbox-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .sandbox-input {
+      background: #070B12;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.6rem 0.85rem;
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .sandbox-input:focus {
+      border-color: var(--cyan);
+    }
+
+    .sandbox-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.72rem;
+      color: #64748B;
+    }
+
+    /* Event Terminal */
+    .terminal-container {
+      background: #05080E;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      height: 220px;
+      overflow-y: auto;
+      padding: 0.5rem 0.6rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .term-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.15rem 0.3rem;
+      border-radius: 4px;
+    }
+
+    .term-line:hover {
+      background: rgba(255,255,255,0.03);
+    }
+
+    .term-down { color: var(--emerald); font-weight: 700; }
+    .term-up   { color: var(--amber); }
+    .term-key  { color: #fff; font-weight: 700; }
+    .term-code { color: var(--cyan); }
+    .term-time { color: #475569; }
+
+    /* Inspector Properties */
+    .prop-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+
+    .prop-item {
+      background: rgba(0,0,0,0.25);
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+    }
+
+    .prop-item .p-lbl {
+      font-size: 0.68rem;
+      color: #64748B;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .prop-item .p-val {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #fff;
+      margin-top: 0.15rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Studio Header -->
+  <header>
+    <div class="brand-wrap">
+      <div class="brand-badge">G80</div>
+      <div class="brand-text">
+        <h1>Glove80 Studio <span style="font-size: 0.7rem; color: var(--emerald); font-weight: 700;">● Live Telemetry</span></h1>
+        <p>Verified Colemak-DH Engrammer v38 & Contoured Matrix</p>
+      </div>
+    </div>
+    <div class="top-controls">
+      <button class="btn-pill active" id="soundToggle">🔊 Click: ON</button>
+      <button class="btn-pill" id="clearBoardBtn">🧹 Reset Markers</button>
+      <button class="btn-pill" id="exportBtn">📥 Export CSV</button>
+    </div>
+  </header>
+
+  <!-- Layer Tabs Bar -->
+  <div class="layer-strip" id="layerBar">
+    <button class="layer-tab active" data-layer="0"><span class="l-idx">0</span> Base Colemak-DH</button>
+    <button class="layer-tab" data-layer="12"><span class="l-idx">12</span> ⚡ Tmux & Nav</button>
+    <button class="layer-tab" data-layer="13"><span class="l-idx">13</span> ✂️ Selection & Edit</button>
+    <button class="layer-tab" data-layer="15"><span class="l-idx">15</span> 🌦️ Emojis</button>
+    <button class="layer-tab" data-layer="17"><span class="l-idx">17</span> 🔢 Numpad & Symbols</button>
+    <button class="layer-tab" data-layer="19"><span class="l-idx">19</span> 🌐 World Accents (272)</button>
+    <button class="layer-tab" data-layer="21"><span class="l-idx">21</span> ⌨️ QWERTY Fallback</button>
+    <button class="layer-tab" data-layer="22"><span class="l-idx">22</span> 🎛️ Function Hub (F11-F24)</button>
+    <button class="layer-tab" data-layer="23"><span class="l-idx">23</span> 🪄 Hardware Magic</button>
+
+    <div class="live-indicator" id="liveLayerBadge">
+      <span class="dot-pulse"></span>
+      <span id="liveLayerText">Live: 0 (Base)</span>
+    </div>
+  </div>
+
+  <!-- Studio Grid -->
+  <main class="studio-layout">
+
+    <!-- Left: Split Keyboard -->
+    <div class="keyboard-stage">
+      <div class="layer-heading">
+        <h2 id="layerTitle">Layer 0: Base Layer (Glorious Engrammer Colemak-DH)</h2>
+        <p id="layerDesc">Space on lower outer thumb (L12 Nav hold); Delete on lower outer thumb (L19 World hold). Bilateral HRMs.</p>
+      </div>
+
+      <div class="split-board">
+        <!-- Left Half -->
+        <div class="glove-half">
+          <div class="half-label">Left Hand (Central Master — 40 Keys)</div>
+          <div class="concave-matrix" id="lhGrid"></div>
+          <div class="thumb-cluster left-wing" id="lhThumbs"></div>
+        </div>
+
+        <!-- Right Half -->
+        <div class="glove-half">
+          <div class="half-label">Right Hand (Peripheral — 40 Keys)</div>
+          <div class="concave-matrix" id="rhGrid"></div>
+          <div class="thumb-cluster right-wing" id="rhThumbs"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Dock: Live Telemetry & Inspector -->
+    <div class="studio-dock">
+      
+      <!-- Key Spotlight Card -->
+      <div class="dock-card">
+        <div class="card-title">
+          <span>🎯 Live Keystroke Spotlight</span>
+          <span style="color: var(--emerald);" id="testedCount">0 / 80 Tested</span>
+        </div>
+        <div class="spotlight-box">
+          <div>
+            <div class="spotlight-key" id="spotKey">-</div>
+            <div style="font-size: 0.72rem; color: #64748B;" id="spotCode">Scan Code: -</div>
+          </div>
+          <div class="spotlight-meta">
+            <div id="spotKeyCode" style="color: var(--amber); font-weight:700;">-</div>
+            <div id="spotHold">Hold: -</div>
+          </div>
+        </div>
+
+        <!-- Modifiers Strip -->
+        <div class="mod-row">
+          <div class="mod-pill" id="modCtrl">⌃ CTRL</div>
+          <div class="mod-pill" id="modAlt">⌥ OPT</div>
+          <div class="mod-pill" id="modShift">⇧ SHIFT</div>
+          <div class="mod-pill" id="modCmd">⌘ CMD</div>
+        </div>
+      </div>
+
+      <!-- Live Typing Sandbox -->
+      <div class="dock-card">
+        <div class="card-title">
+          <span>⌨️ Live Typing Sandbox</span>
+          <button style="background:none; border:none; color: var(--cyan); font-size:0.75rem; cursor:pointer;" id="clearSandboxBtn">Clear</button>
+        </div>
+        <div class="sandbox-wrap">
+          <input type="text" class="sandbox-input" id="sandbox" placeholder="Type on Glove80 or click keys...">
+          <div class="sandbox-meta">
+            <span id="charCount">0 characters</span>
+            <span style="color: #94A3B8;">Auto-detects live layers</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Selected Key Inspector -->
+      <div class="dock-card">
+        <div class="card-title">🔍 Selected Key Inspector</div>
+        <div class="prop-grid">
+          <div class="prop-item">
+            <div class="p-lbl">Primary Tap</div>
+            <div class="p-val" id="inspTap">-</div>
+          </div>
+          <div class="prop-item">
+            <div class="p-lbl">Hold / Shift</div>
+            <div class="p-val" id="inspHold" style="color: var(--purple);">-</div>
+          </div>
+          <div class="prop-item">
+            <div class="p-lbl">ZMK Behavior</div>
+            <div class="p-val" id="inspBeh" style="color: var(--emerald);">-</div>
+          </div>
+          <div class="prop-item">
+            <div class="p-lbl">Matrix Coordinate</div>
+            <div class="p-val" id="inspPos" style="color: var(--cyan);">-</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Event Terminal Feed -->
+      <div class="dock-card" style="flex: 1;">
+        <div class="card-title">
+          <span>⚡ Live Telemetry Stream</span>
+          <span style="font-size:0.7rem; color:#64748B;" id="eventCount">0 events</span>
+        </div>
+        <div class="terminal-container" id="termFeed">
+          <div style="color: #475569; text-align: center; padding: 2rem 0;">
+            Hit any key on your Glove80 to start stream...
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    // Audio Synthesizer for Kailh Choc Clicks
+    let soundEnabled = true;
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playClickSound() {
+      if (!soundEnabled) return;
+      try {
+        initAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(520, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(140, audioCtx.currentTime + 0.035);
+        gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.035);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.035);
+      } catch (e) {}
+    }
+
+    document.getElementById("soundToggle").addEventListener("click", function() {
+      soundEnabled = !soundEnabled;
+      this.classList.toggle("active", soundEnabled);
+      this.textContent = soundEnabled ? "🔊 Click: ON" : "🔇 Sound: OFF";
+    });
+
+    const LAYERS = {
+      0: {
+        title: "Layer 0: Base Layer (Glorious Engrammer Colemak-DH)",
+        desc: "Left Space on lower outer thumb (L12 Nav hold); Right Delete on lower outer thumb (L19 World hold). Bilateral HRMs.",
+        lh: [
+          { stagger: "stg-pinky-ext", keys: [ { m: "F1", s: "", sub: "" }, { m: "`", s: "~", sub: "" }, { m: "Q", s: "", sub: "" }, { m: "A", s: "", sub: "LAlt", home: true }, { m: "Z", s: "", sub: "" }, { m: "Magic", s: "", sub: "Sys", switchLayer: 23 } ] },
+          { stagger: "stg-pinky", keys: [ { m: "F2", s: "", sub: "" }, { m: "1", s: "|", sub: "" }, { m: "W", s: "", sub: "" }, { m: "R", s: "", sub: "LGui", home: true }, { m: "X", s: "", sub: "" }, { m: "Home", s: "", sub: "" } ] },
+          { stagger: "stg-ring", keys: [ { m: "F3", s: "", sub: "" }, { m: "2", s: "=", sub: "" }, { m: "F", s: "", sub: "" }, { m: "S", s: "", sub: "LCtrl", home: true }, { m: "C", s: "", sub: "" }, { m: "End", s: "", sub: "" } ] },
+          { stagger: "stg-mid", keys: [ { m: "F4", s: "", sub: "" }, { m: "3", s: "~", sub: "" }, { m: "P", s: "", sub: "" }, { m: "T", s: "", sub: "LShift", home: true }, { m: "D", s: "", sub: "" }, { m: "PgUp", s: "", sub: "" } ] },
+          { stagger: "stg-idx", keys: [ { m: "F5", s: "", sub: "" }, { m: "4", s: "+", sub: "" }, { m: "B", s: "", sub: "" }, { m: "G", s: "", sub: "" }, { m: "V", s: "", sub: "" }, { m: "PgDn", s: "", sub: "" } ] },
+          { stagger: "stg-inner", keys: [ { m: "5", s: "<", sub: "" }, { m: "’", s: "(", sub: "" }, { m: "I", s: "", sub: "" }, { m: "M", s: "", sub: "" } ] }
+        ],
+        lhThumbs: [
+          { m: "Esc", s: "", sub: "T1" }, { m: "Enter", s: "", sub: "T2 (73) L1", switchLayer: 1 }, { m: "End", s: "", sub: "T3" },
+          { m: "Space", s: "", sub: "T4", isSpace: true }, { m: "BkSp", s: "", sub: "T5" }, { m: "BkSp", s: "", sub: "T6 (74)" }
+        ],
+        rh: [
+          { stagger: "stg-inner", keys: [ { m: "6", s: ">", sub: "" }, { m: "”", s: ")", sub: "" }, { m: "H", s: "", sub: "" }, { m: "K", s: "", sub: "" } ] },
+          { stagger: "stg-idx", keys: [ { m: "F6", s: "", sub: "" }, { m: "7", s: "^", sub: "" }, { m: "J", s: "", sub: "" }, { m: "N", s: "", sub: "RShift", home: true }, { m: "M", s: "", sub: "" }, { m: "Enter", s: "", sub: "" } ] },
+          { stagger: "stg-mid", keys: [ { m: "F7", s: "", sub: "" }, { m: "8", s: "&", sub: "" }, { m: "L", s: "", sub: "" }, { m: "E", s: "", sub: "RCtrl", home: true }, { m: "H", s: "", sub: "" }, { m: "Del", s: "", sub: "" } ] },
+          { stagger: "stg-ring", keys: [ { m: "F8", s: "", sub: "" }, { m: "9", s: "%", sub: "" }, { m: "U", s: "", sub: "" }, { m: "I", s: "", sub: "RGui", home: true }, { m: ",", s: "<", sub: "" }, { m: "Up", s: "", sub: "" } ] },
+          { stagger: "stg-pinky", keys: [ { m: "F9", s: "", sub: "" }, { m: "0", s: "*", sub: "" }, { m: "Y", s: "", sub: "" }, { m: "O", s: "", sub: "RAlt", home: true }, { m: ".", s: ">", sub: "" }, { m: "Down", s: "", sub: "" } ] },
+          { stagger: "stg-pinky-ext", keys: [ { m: "F10", s: "", sub: "" }, { m: "-", s: "_", sub: "" }, { m: ";", s: ":", sub: "" }, { m: "/", s: "?", sub: "" }, { m: "'", s: '"', sub: "" }, { m: "Right", s: "", sub: "" } ] }
+        ],
+        rhThumbs: [
+          { m: "Space", s: "", sub: "T1", isSpace: true }, { m: "Del", s: "", sub: "T2" }, { m: "RCtrl", s: "", sub: "T3" },
+          { m: "Tab", s: "", sub: "T4 (72) L1", switchLayer: 1 }, { m: "Alt", s: "", sub: "T5" }, { m: "RGui", s: "", sub: "T6 (Cmd)" }
+        ]
+      },
+      12: {
+        title: "Layer 12: Tmux & Window Navigation",
+        desc: "Tmux pane switching (mod_tab_switcher), session jumps, and cursor navigations.",
+        lh: [
+          { stagger: "stg-pinky-ext", keys: [ { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "Base", s: "", sub: "L0", switchLayer: 0 } ] },
+          { stagger: "stg-pinky", keys: [ { m: "___", s: "", sub: "" }, { m: "PrevWin", s: "", sub: "Tmux" }, { m: "LeftPane", s: "", sub: "Tmux" }, { m: "UpPane", s: "", sub: "Tmux" }, { m: "RightPane", s: "", sub: "Tmux" }, { m: "NextWin", s: "", sub: "Tmux" } ] },
+          { stagger: "stg-ring", keys: [ { m: "___", s: "", sub: "" }, { m: "SplitV", s: "", sub: "Tmux" }, { m: "SplitH", s: "", sub: "Tmux" }, { m: "DownPane", s: "", sub: "Tmux" }, { m: "Zoom", s: "", sub: "Tmux" }, { m: "Kill", s: "", sub: "Tmux" } ] },
+          { stagger: "stg-mid", keys: [ { m: "___", s: "", sub: "" }, { m: "Session1", s: "", sub: "Tmux" }, { m: "Session2", s: "", sub: "Tmux" }, { m: "Session3", s: "", sub: "Tmux" }, { m: "Session4", s: "", sub: "Tmux" }, { m: "Attach", s: "", sub: "Tmux" } ] },
+          { stagger: "stg-idx", keys: [ { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-inner", keys: [ { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] }
+        ],
+        lhThumbs: [
+          { m: "TabSwitch", s: "", sub: "Active" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" },
+          { m: "Space", s: "", sub: "Hold Active", isSpace: true }, { m: "BkSp", s: "", sub: "" }, { m: "Enter", s: "", sub: "" }
+        ],
+        rh: [
+          { stagger: "stg-inner", keys: [ { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-idx", keys: [ { m: "ExtWord", s: "", sub: "Extend" }, { m: "ExtLine", s: "", sub: "Extend" }, { m: "SelWord", s: "", sub: "Select" }, { m: "SelLine", s: "", sub: "Select" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-mid", keys: [ { m: "Home", s: "", sub: "" }, { m: "Left", s: "", sub: "" }, { m: "Down", s: "", sub: "" }, { m: "Up", s: "", sub: "" }, { m: "Right", s: "", sub: "" }, { m: "End", s: "", sub: "" } ] },
+          { stagger: "stg-ring", keys: [ { m: "PgUp", s: "", sub: "" }, { m: "WordL", s: "", sub: "" }, { m: "WordR", s: "", sub: "" }, { m: "PgDn", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-pinky", keys: [ { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-pinky-ext", keys: [ { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] }
+        ],
+        rhThumbs: [
+          { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" },
+          { m: "Enter", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "Del", s: "", sub: "Del Char" }
+        ]
+      },
+      13: {
+        title: "Layer 13: Text Selection & Line Extend",
+        desc: "Precision cursor expansion, line highlighting, and code refactoring selections.",
+        lh: [
+          { stagger: "stg-pinky-ext", keys: [ { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "Base", s: "", sub: "L0", switchLayer: 0 } ] },
+          { stagger: "stg-pinky", keys: [ { m: "___", s: "", sub: "" }, { m: "SelAll", s: "", sub: "Cmd+A" }, { m: "Cut", s: "", sub: "Cmd+X" }, { m: "Copy", s: "", sub: "Cmd+C" }, { m: "Paste", s: "", sub: "Cmd+V" }, { m: "Undo", s: "", sub: "Cmd+Z" } ] },
+          { stagger: "stg-ring", keys: [ { m: "___", s: "", sub: "" }, { m: "SelWord", s: "", sub: "Select" }, { m: "SelLine", s: "", sub: "Select" }, { m: "SelBlock", s: "", sub: "Select" }, { m: "ExtLeft", s: "", sub: "Shift" }, { m: "ExtRight", s: "", sub: "Shift" } ] },
+          { stagger: "stg-mid", keys: [ { m: "___", s: "", sub: "" }, { m: "Indent+", s: "", sub: "" }, { m: "Indent-", s: "", sub: "" }, { m: "Comment", s: "", sub: "Cmd+/" }, { m: "Duplicate", s: "", sub: "Shift+Opt+Down" }, { m: "DeleteLine", s: "", sub: "Cmd+Shift+K" } ] },
+          { stagger: "stg-idx", keys: [ { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-inner", keys: [ { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] }
+        ],
+        lhThumbs: [
+          { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" },
+          { m: "Space", s: "", sub: "L12 Nav", isSpace: true, switchLayer: 12 }, { m: "BkSp", s: "", sub: "" }, { m: "Enter", s: "", sub: "" }
+        ],
+        rh: [
+          { stagger: "stg-inner", keys: [ { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-idx", keys: [ { m: "ExtWord", s: "", sub: "Shift+Opt" }, { m: "ExtLine", s: "", sub: "Shift+Cmd" }, { m: "SelWord", s: "", sub: "" }, { m: "SelLine", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-mid", keys: [ { m: "SelHome", s: "", sub: "Shift+Home" }, { m: "SelLeft", s: "", sub: "Shift+Left" }, { m: "SelDown", s: "", sub: "Shift+Down" }, { m: "SelUp", s: "", sub: "Shift+Up" }, { m: "SelRight", s: "", sub: "Shift+Right" }, { m: "SelEnd", s: "", sub: "Shift+End" } ] },
+          { stagger: "stg-ring", keys: [ { m: "SelPgUp", s: "", sub: "Shift+PgUp" }, { m: "WordL", s: "", sub: "Shift+Opt+L" }, { m: "WordR", s: "", sub: "Shift+Opt+R" }, { m: "SelPgDn", s: "", sub: "Shift+PgDn" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-pinky", keys: [ { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-pinky-ext", keys: [ { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] }
+        ],
+        rhThumbs: [
+          { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" },
+          { m: "Enter", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "Del", s: "", sub: "Del Char" }
+        ]
+      },
+      15: {
+        title: "Layer 15: Weather & Common Emojis",
+        desc: "Direct Unicode macro injection for weather symbols, expressions, and calendar icons.",
+        lh: [
+          { stagger: "stg-pinky-ext", keys: [ { m: "☀️", s: "", sub: "Sunny" }, { m: "🌤️", s: "", sub: "P.Cloud" }, { m: "⛅", s: "", sub: "M.Cloud" }, { m: "☁️", s: "", sub: "Cloudy" }, { m: "🌧️", s: "", sub: "Rain" }, { m: "Base", s: "", sub: "L0", switchLayer: 0 } ] },
+          { stagger: "stg-pinky", keys: [ { m: "⛈️", s: "", sub: "Storm" }, { m: "❄️", s: "", sub: "Snow" }, { m: "🌪️", s: "", sub: "Tornado" }, { m: "🌈", s: "", sub: "Rainbow" }, { m: "⚡", s: "", sub: "Zap" }, { m: "🔥", s: "", sub: "Fire" } ] },
+          { stagger: "stg-ring", keys: [ { m: "🌙", s: "", sub: "Moon" }, { m: "⭐", s: "", sub: "Star" }, { m: "✨", s: "", sub: "Sparkle" }, { m: "🌕", s: "", sub: "Full" }, { m: "🌑", s: "", sub: "New" }, { m: "🌟", s: "", sub: "Glow" } ] },
+          { stagger: "stg-mid", keys: [ { m: "😀", s: "", sub: "Grin" }, { m: "😂", s: "", sub: "Joy" }, { m: "😍", s: "", sub: "Heart" }, { m: "🤔", s: "", sub: "Think" }, { m: "😎", s: "", sub: "Cool" }, { m: "🎉", s: "", sub: "Party" } ] },
+          { stagger: "stg-idx", keys: [ { m: "👍", s: "", sub: "ThumbsUp" }, { m: "👎", s: "", sub: "ThumbsDown" }, { m: "👏", s: "", sub: "Clap" }, { m: "🙌", s: "", sub: "Celebrate" }, { m: "🤝", s: "", sub: "Handshake" }, { m: "🚀", s: "", sub: "Rocket" } ] },
+          { stagger: "stg-inner", keys: [ { m: "💡", s: "", sub: "Idea" }, { m: "📌", s: "", sub: "Pin" }, { m: "✅", s: "", sub: "Check" }, { m: "❌", s: "", sub: "Cross" } ] }
+        ],
+        lhThumbs: [
+          { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" },
+          { m: "Space", s: "", sub: "L12 Nav", isSpace: true, switchLayer: 12 }, { m: "BkSp", s: "", sub: "" }, { m: "Enter", s: "", sub: "" }
+        ],
+        rh: [
+          { stagger: "stg-inner", keys: [ { m: "🔍", s: "", sub: "Search" }, { m: "🔗", s: "", sub: "Link" }, { m: "📁", s: "", sub: "Folder" }, { m: "📄", s: "", sub: "Doc" } ] },
+          { stagger: "stg-idx", keys: [ { m: "❤️", s: "", sub: "Heart" }, { m: "💯", s: "", sub: "100" }, { m: "⚠️", s: "", sub: "Warn" }, { m: "ℹ️", s: "", sub: "Info" }, { m: "☕", s: "", sub: "Coffee" }, { m: "🍎", s: "", sub: "Apple" } ] },
+          { stagger: "stg-mid", keys: [ { m: "💻", s: "", sub: "Laptop" }, { m: "📱", s: "", sub: "Phone" }, { m: "⌨️", s: "", sub: "Keyboard" }, { m: "🖥️", s: "", sub: "Screen" }, { m: "⏱️", s: "", sub: "Timer" }, { m: "🔔", s: "", sub: "Bell" } ] },
+          { stagger: "stg-ring", keys: [ { m: "📈", s: "", sub: "Up" }, { m: "📉", s: "", sub: "Down" }, { m: "📊", s: "", sub: "Chart" }, { m: "📦", s: "", sub: "Box" }, { m: "🔒", s: "", sub: "Lock" }, { m: "🔑", s: "", sub: "Key" } ] },
+          { stagger: "stg-pinky", keys: [ { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-pinky-ext", keys: [ { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] }
+        ],
+        rhThumbs: [
+          { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" },
+          { m: "Enter", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "Del", s: "", sub: "Del Char" }
+        ]
+      },
+      17: {
+        title: "Layer 17: Directional Numpad & Symbols",
+        desc: "Right-hand numeric keypad cluster, arithmetic operators, and cursor movement.",
+        lh: [
+          { stagger: "stg-pinky-ext", keys: [ { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "Base", s: "", sub: "L0", switchLayer: 0 } ] },
+          { stagger: "stg-pinky", keys: [ { m: "___", s: "", sub: "" }, { m: "Home", s: "", sub: "" }, { m: "WordL", s: "", sub: "" }, { m: "Up", s: "", sub: "" }, { m: "WordR", s: "", sub: "" }, { m: "PgUp", s: "", sub: "" } ] },
+          { stagger: "stg-ring", keys: [ { m: "___", s: "", sub: "" }, { m: "End", s: "", sub: "" }, { m: "Left", s: "", sub: "" }, { m: "Down", s: "", sub: "" }, { m: "Right", s: "", sub: "" }, { m: "PgDn", s: "", sub: "" } ] },
+          { stagger: "stg-mid", keys: [ { m: "___", s: "", sub: "" }, { m: "Undo", s: "", sub: "" }, { m: "Cut", s: "", sub: "" }, { m: "Copy", s: "", sub: "" }, { m: "Paste", s: "", sub: "" }, { m: "Redo", s: "", sub: "" } ] },
+          { stagger: "stg-idx", keys: [ { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-inner", keys: [ { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] }
+        ],
+        lhThumbs: [
+          { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "Tab", s: "", sub: "Active" },
+          { m: "Space", s: "", sub: "Active", isSpace: true }, { m: "BkSp", s: "", sub: "" }, { m: "Enter", s: "", sub: "" }
+        ],
+        rh: [
+          { stagger: "stg-inner", keys: [ { m: "/", s: "", sub: "" }, { m: "*", s: "", sub: "" }, { m: "-", s: "", sub: "" }, { m: "+", s: "", sub: "" } ] },
+          { stagger: "stg-idx", keys: [ { m: "NumLock", s: "", sub: "" }, { m: "7", s: "", sub: "" }, { m: "4", s: "", sub: "" }, { m: "1", s: "", sub: "" }, { m: "0", s: "", sub: "" }, { m: "00", s: "", sub: "" } ] },
+          { stagger: "stg-mid", keys: [ { m: "=", s: "", sub: "" }, { m: "8", s: "", sub: "" }, { m: "5", s: "", sub: "" }, { m: "2", s: "", sub: "" }, { m: ".", s: "", sub: "" }, { m: "Enter", s: "", sub: "" } ] },
+          { stagger: "stg-ring", keys: [ { m: "___", s: "", sub: "" }, { m: "9", s: "", sub: "" }, { m: "6", s: "", sub: "" }, { m: "3", s: "", sub: "" }, { m: ",", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-pinky", keys: [ { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-pinky-ext", keys: [ { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] }
+        ],
+        rhThumbs: [
+          { m: "BkSp", s: "", sub: "" }, { m: "(", s: "", sub: "" }, { m: "0", s: "", sub: "" },
+          { m: "Enter", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "Del", s: "", sub: "Del Char" }
+        ]
+      },
+      19: {
+        title: "Layer 19: World Accents & International Diacritics (272 Macros)",
+        desc: "Direct triggers for 272 international diacritics, European currencies, and typographic symbols.",
+        lh: [
+          { stagger: "stg-pinky-ext", keys: [ { m: "€", s: "", sub: "Euro" }, { m: "à", s: "À", sub: "Grave" }, { m: "è", s: "È", sub: "Grave" }, { m: "ì", s: "Ì", sub: "Grave" }, { m: "___", s: "", sub: "" }, { m: "Base", s: "", sub: "L0", switchLayer: 0 } ] },
+          { stagger: "stg-pinky", keys: [ { m: "£", s: "", sub: "Pound" }, { m: "á", s: "Á", sub: "Acute" }, { m: "é", s: "É", sub: "Acute" }, { m: "í", s: "Í", sub: "Acute" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-ring", keys: [ { m: "¥", s: "", sub: "Yen" }, { m: "â", s: "Â", sub: "Circ" }, { m: "ê", s: "Ê", sub: "Circ" }, { m: "î", s: "Î", sub: "Circ" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-mid", keys: [ { m: "₩", s: "", sub: "Won" }, { m: "ä", s: "Ä", sub: "Uml" }, { m: "ë", s: "Ë", sub: "Uml" }, { m: "ï", s: "Ï", sub: "Uml" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-idx", keys: [ { m: "¢", s: "", sub: "Cent" }, { m: "ã", s: "Ã", sub: "Tilde" }, { m: "æ", s: "Æ", sub: "Lig" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-inner", keys: [ { m: "å", s: "Å", sub: "Ring" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] }
+        ],
+        lhThumbs: [
+          { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" },
+          { m: "Space", s: "", sub: "L12 Nav", isSpace: true, switchLayer: 12 }, { m: "___", s: "", sub: "" }, { m: "Enter", s: "", sub: "" }
+        ],
+        rh: [
+          { stagger: "stg-inner", keys: [ { m: "ñ", s: "Ñ", sub: "Tilde" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-idx", keys: [ { m: "___", s: "", sub: "" }, { m: "ç", s: "Ç", sub: "Cedilla" }, { m: "ø", s: "Ø", sub: "Slash" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-mid", keys: [ { m: "___", s: "", sub: "" }, { m: "ö", s: "Ö", sub: "Uml" }, { m: "ü", s: "Ü", sub: "Uml" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-ring", keys: [ { m: "___", s: "", sub: "" }, { m: "ô", s: "Ô", sub: "Circ" }, { m: "û", s: "Û", sub: "Circ" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-pinky", keys: [ { m: "___", s: "", sub: "" }, { m: "ó", s: "Ó", sub: "Acute" }, { m: "ú", s: "Ú", sub: "Acute" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-pinky-ext", keys: [ { m: "___", s: "", sub: "" }, { m: "ò", s: "Ò", sub: "Grave" }, { m: "ù", s: "Ù", sub: "Grave" }, { m: "ß", s: "SS", sub: "Eszett" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] }
+        ],
+        rhThumbs: [
+          { m: "___", s: "", sub: "" }, { m: "(", s: "", sub: "Active" }, { m: "___", s: "", sub: "" },
+          { m: "Enter", s: "", sub: "Active" }, { m: "___", s: "", sub: "" }, { m: "Del", s: "", sub: "Del Char" }
+        ]
+      },
+      21: {
+        title: "Layer 21: Fallback QWERTY Layout",
+        desc: "Standard QWERTY alpha mapping for gaming or unconfigured guest typing sessions.",
+        lh: [
+          { stagger: "stg-pinky-ext", keys: [ { m: "F1", s: "", sub: "" }, { m: "`", s: "~", sub: "" }, { m: "Q", s: "", sub: "" }, { m: "A", s: "", sub: "LShift", home: true }, { m: "Z", s: "", sub: "" }, { m: "Base", s: "", sub: "L0", switchLayer: 0 } ] },
+          { stagger: "stg-pinky", keys: [ { m: "F2", s: "", sub: "" }, { m: "1", s: "!", sub: "" }, { m: "W", s: "", sub: "" }, { m: "S", s: "", sub: "LCtrl", home: true }, { m: "X", s: "", sub: "" }, { m: "Home", s: "", sub: "" } ] },
+          { stagger: "stg-ring", keys: [ { m: "F3", s: "", sub: "" }, { m: "2", s: "@", sub: "" }, { m: "E", s: "", sub: "" }, { m: "D", s: "", sub: "LAlt", home: true }, { m: "C", s: "", sub: "" }, { m: "End", s: "", sub: "" } ] },
+          { stagger: "stg-mid", keys: [ { m: "F4", s: "", sub: "" }, { m: "3", s: "#", sub: "" }, { m: "R", s: "", sub: "" }, { m: "F", s: "", sub: "LGui", home: true }, { m: "V", s: "", sub: "" }, { m: "PgUp", s: "", sub: "" } ] },
+          { stagger: "stg-idx", keys: [ { m: "F5", s: "", sub: "" }, { m: "4", s: "$", sub: "" }, { m: "T", s: "", sub: "" }, { m: "G", s: "", sub: "" }, { m: "B", s: "", sub: "" }, { m: "PgDn", s: "", sub: "" } ] },
+          { stagger: "stg-inner", keys: [ { m: "5", s: "%", sub: "" }, { m: "6", s: "^", sub: "" }, { m: "B", s: "", sub: "" }, { m: "N", s: "", sub: "" } ] }
+        ],
+        lhThumbs: [
+          { m: "___", s: "", sub: "T1" }, { m: "Enter", s: "", sub: "T2 (73) L1", isLocked: true }, { m: "___", s: "", sub: "T3" },
+          { m: "___", s: "", sub: "T4" }, { m: "___", s: "", sub: "T5" }, { m: "0", s: "", sub: "T6 (74) Num0" }
+        ],
+        rh: [
+          { stagger: "stg-inner", keys: [ { m: "7", s: "&", sub: "" }, { m: "8", s: "*", sub: "" }, { m: "H", s: "", sub: "" }, { m: "M", s: "", sub: "" } ] },
+          { stagger: "stg-idx", keys: [ { m: "F6", s: "", sub: "" }, { m: "9", s: "(", sub: "" }, { m: "Y", s: "", sub: "" }, { m: "H", s: "", sub: "" }, { m: "N", s: "", sub: "" }, { m: "Enter", s: "", sub: "" } ] },
+          { stagger: "stg-mid", keys: [ { m: "F7", s: "", sub: "" }, { m: "0", s: ")", sub: "" }, { m: "U", s: "", sub: "" }, { m: "J", s: "", sub: "RGui", home: true }, { m: "M", s: "", sub: "" }, { m: "Del", s: "", sub: "" } ] },
+          { stagger: "stg-ring", keys: [ { m: "F8", s: "", sub: "" }, { m: "-", s: "_", sub: "" }, { m: "I", s: "", sub: "" }, { m: "K", s: "", sub: "RAlt", home: true }, { m: ",", s: "<", sub: "" }, { m: "Up", s: "", sub: "" } ] },
+          { stagger: "stg-pinky", keys: [ { m: "F9", s: "", sub: "" }, { m: "=", s: "+", sub: "" }, { m: "O", s: "", sub: "" }, { m: "L", s: "", sub: "RCtrl", home: true }, { m: ".", s: ">", sub: "" }, { m: "Down", s: "", sub: "" } ] },
+          { stagger: "stg-pinky-ext", keys: [ { m: "F10", s: "", sub: "" }, { m: "[", s: "{", sub: "" }, { m: "P", s: "", sub: "" }, { m: ";", s: ":", sub: "RShift", home: true }, { m: "/", s: "?", sub: "" }, { m: "Right", s: "", sub: "" } ] }
+        ],
+        rhThumbs: [
+          { m: "[", s: "", sub: "" }, { m: "]", s: "", sub: "" }, { m: "RCtrl", s: "", sub: "" },
+          { m: "Enter", s: "", sub: "" }, { m: "Space", s: "", sub: "" }, { m: "Del", s: "", sub: "" }
+        ]
+      },
+      22: {
+        title: "Layer 22: Function Hub & Direct Layer Switcher (F11-F24)",
+        desc: "Direct access to high function keys, system utilities, and instant layer switches.",
+        lh: [
+          { stagger: "stg-pinky-ext", keys: [ { m: "F11", s: "", sub: "" }, { m: "F12", s: "", sub: "" }, { m: "F13", s: "", sub: "" }, { m: "F14", s: "", sub: "" }, { m: "F15", s: "", sub: "" }, { m: "Base", s: "", sub: "L0", switchLayer: 0 } ] },
+          { stagger: "stg-pinky", keys: [ { m: "L12 Tmux", s: "", sub: "Switch", switchLayer: 12 }, { m: "L13 Sel", s: "", sub: "Switch", switchLayer: 13 }, { m: "L15 Emoji", s: "", sub: "Switch", switchLayer: 15 }, { m: "L17 Num", s: "", sub: "Switch", switchLayer: 17 }, { m: "L19 World", s: "", sub: "Switch", switchLayer: 19 }, { m: "L21 Qwerty", s: "", sub: "Switch", switchLayer: 21 } ] },
+          { stagger: "stg-ring", keys: [ { m: "F16", s: "", sub: "" }, { m: "F17", s: "", sub: "" }, { m: "F18", s: "", sub: "" }, { m: "F19", s: "", sub: "" }, { m: "F20", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-mid", keys: [ { m: "F21", s: "", sub: "" }, { m: "F22", s: "", sub: "" }, { m: "F23", s: "", sub: "" }, { m: "F24", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-idx", keys: [ { m: "CapsLock", s: "", sub: "Lock" }, { m: "NumLock", s: "", sub: "Lock" }, { m: "ScrollLock", s: "", sub: "Lock" }, { m: "Insert", s: "", sub: "" }, { m: "PrintScr", s: "", sub: "" }, { m: "Pause", s: "", sub: "" } ] },
+          { stagger: "stg-inner", keys: [ { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] }
+        ],
+        lhThumbs: [
+          { m: "L12", s: "", sub: "Tmux", switchLayer: 12 }, { m: "L13", s: "", sub: "Sel", switchLayer: 13 }, { m: "L15", s: "", sub: "Emoji", switchLayer: 15 },
+          { m: "Space", s: "", sub: "L12 Nav", isSpace: true, switchLayer: 12 }, { m: "BkSp", s: "", sub: "" }, { m: "Enter", s: "", sub: "" }
+        ],
+        rh: [
+          { stagger: "stg-inner", keys: [ { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-idx", keys: [ { m: "Mute", s: "", sub: "Audio" }, { m: "Vol-", s: "", sub: "Sound" }, { m: "Vol+", s: "", sub: "Sound" }, { m: "Play", s: "", sub: "Media" }, { m: "Prev", s: "", sub: "Track" }, { m: "Next", s: "", sub: "Track" } ] },
+          { stagger: "stg-mid", keys: [ { m: "Bri-", s: "", sub: "Display" }, { m: "Bri+", s: "", sub: "Display" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-ring", keys: [ { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-pinky", keys: [ { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-pinky-ext", keys: [ { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] }
+        ],
+        rhThumbs: [
+          { m: "L17", s: "", sub: "Num", switchLayer: 17 }, { m: "L19", s: "", sub: "World", switchLayer: 19 }, { m: "L21", s: "", sub: "Qwerty", switchLayer: 21 },
+          { m: "Enter", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "Del", s: "", sub: "Del Char" }
+        ]
+      },
+      23: {
+        title: "Layer 23: Hardware Magic, Bluetooth Profiles & Bootloader",
+        desc: "Glove80 hardware management, BLE profile switching (1-4), USB/BLE output selection, and bootloader mass-storage.",
+        lh: [
+          { stagger: "stg-pinky-ext", keys: [ { m: "Boot", s: "", sub: "Flash" }, { m: "BT_Clr", s: "", sub: "Unpair" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "Base", s: "", sub: "L0", switchLayer: 0 } ] },
+          { stagger: "stg-pinky", keys: [ { m: "SysOff", s: "", sub: "Sleep" }, { m: "BT_1", s: "", sub: "Mac" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-ring", keys: [ { m: "RGB_Tog", s: "", sub: "LED" }, { m: "BT_2", s: "", sub: "iPad" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-mid", keys: [ { m: "RGB_Bri+", s: "", sub: "Light" }, { m: "BT_3", s: "", sub: "iPhone" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-idx", keys: [ { m: "RGB_Bri-", s: "", sub: "Dim" }, { m: "BT_4", s: "", sub: "Linux" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-inner", keys: [ { m: "Out_USB", s: "", sub: "Wired" }, { m: "Out_BLE", s: "", sub: "Radio" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" } ] }
+        ],
+        lhThumbs: [
+          { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" },
+          { m: "Space", s: "", sub: "L12 Nav", isSpace: true, switchLayer: 12 }, { m: "___", s: "", sub: "" }, { m: "Enter", s: "", sub: "" }
+        ],
+        rh: [
+          { stagger: "stg-inner", keys: [ { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-idx", keys: [ { m: "Mute", s: "", sub: "Audio" }, { m: "Vol-", s: "", sub: "Sound" }, { m: "Vol+", s: "", sub: "Sound" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-mid", keys: [ { m: "Play", s: "", sub: "Media" }, { m: "Prev", s: "", sub: "Track" }, { m: "Next", s: "", sub: "Track" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-ring", keys: [ { m: "Bri-", s: "", sub: "Display" }, { m: "Bri+", s: "", sub: "Display" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-pinky", keys: [ { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] },
+          { stagger: "stg-pinky-ext", keys: [ { m: "Boot", s: "", sub: "Right Half" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "" } ] }
+        ],
+        rhThumbs: [
+          { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" }, { m: "___", s: "", sub: "" },
+          { m: "Enter", s: "", sub: "L19 World", switchLayer: 19 }, { m: "___", s: "", sub: "" }, { m: "Del", s: "", sub: "Del Char" }
+        ]
+      }
+    };
+
+    let activeLayer = 0;
+    const testedKeysSet = new Set();
+    const keyPressTimers = new Map();
+    const eventLogData = [];
+    let eventIndex = 0;
+
+    function createKeycap(data, colIdx, half, isThumb = false) {
+      const cap = document.createElement("div");
+      cap.className = "keycap";
+      if (data.home) cap.classList.add("home-row");
+      if (data.isSpace) cap.classList.add("space-key");
+
+      const pos = isThumb ? `${half}_T${colIdx}` : `${half}_C${colIdx}`;
+      cap.dataset.pos = pos;
+      cap.dataset.keyMain = data.m || "";
+      cap.dataset.keyShift = data.s || "";
+      cap.dataset.keySub = data.sub || "";
+
+      if (testedKeysSet.has(pos) || testedKeysSet.has((data.m || "").toUpperCase())) {
+        cap.classList.add("hw-tested");
+      }
+
+      cap.innerHTML = `
+        <span class="cap-shift">${data.s || ""}</span>
+        <span class="cap-main">${data.m || ""}</span>
+        <span class="cap-sub">${data.sub || ""}</span>
+      `;
+
+      cap.addEventListener("click", () => {
+        inspectKey(data, pos);
+        typeKeyToSandbox(data.m);
+        playClickSound();
+        if (data.switchLayer !== undefined) {
+          switchLayer(data.switchLayer);
+        }
+      });
+
+      return cap;
+    }
+
+    function render() {
+      const layer = LAYERS[activeLayer] || LAYERS[0];
+      document.getElementById("layerTitle").textContent = layer.title;
+      document.getElementById("layerDesc").textContent = layer.desc;
+
+      // Render Left Well
+      const lhGrid = document.getElementById("lhGrid");
+      lhGrid.innerHTML = "";
+      layer.lh.forEach((col, colIdx) => {
+        const colDiv = document.createElement("div");
+        colDiv.className = `col-stack ${col.stagger}`;
+        col.keys.forEach((keyData) => {
+          colDiv.appendChild(createKeycap(keyData, colIdx, "LH"));
+        });
+        lhGrid.appendChild(colDiv);
+      });
+
+      // Render Left Thumbs
+      const lhThumbs = document.getElementById("lhThumbs");
+      lhThumbs.innerHTML = "";
+      layer.lhThumbs.forEach((keyData, idx) => {
+        lhThumbs.appendChild(createKeycap(keyData, idx + 1, "LH", true));
+      });
+
+      // Render Right Well
+      const rhGrid = document.getElementById("rhGrid");
+      rhGrid.innerHTML = "";
+      layer.rh.forEach((col, colIdx) => {
+        const colDiv = document.createElement("div");
+        colDiv.className = `col-stack ${col.stagger}`;
+        col.keys.forEach((keyData) => {
+          colDiv.appendChild(createKeycap(keyData, colIdx, "RH"));
+        });
+        rhGrid.appendChild(colDiv);
+      });
+
+      // Render Right Thumbs
+      const rhThumbs = document.getElementById("rhThumbs");
+      rhThumbs.innerHTML = "";
+      layer.rhThumbs.forEach((keyData, idx) => {
+        rhThumbs.appendChild(createKeycap(keyData, idx + 1, "RH", true));
+      });
+    }
+
+    function switchLayer(idx) {
+      activeLayer = idx;
+      document.querySelectorAll(".layer-tab").forEach(btn => {
+        btn.classList.toggle("active", parseInt(btn.dataset.layer, 10) === idx);
+      });
+      render();
+    }
+
+    document.querySelectorAll(".layer-tab").forEach(btn => {
+      btn.addEventListener("click", () => {
+        switchLayer(parseInt(btn.dataset.layer, 10));
+      });
+    });
+
+    function inspectKey(data, pos) {
+      document.getElementById("inspTap").textContent = data.m || "None";
+      document.getElementById("inspHold").textContent = data.s || (data.sub ? `Hold: ${data.sub}` : "None");
+      document.getElementById("inspBeh").textContent = data.home ? "Bilateral HRM" : (data.switchLayer !== undefined ? `Layer ${data.switchLayer}` : "&kp (Press)");
+      document.getElementById("inspPos").textContent = pos;
+    }
+
+    function typeKeyToSandbox(text) {
+      if (!text || text === "___" || text.length > 6) return;
+      const input = document.getElementById("sandbox");
+      if (text === "BkSp" || text === "Del") {
+        input.value = input.value.slice(0, -1);
+      } else if (text === "Space") {
+        input.value += " ";
+      } else if (text === "Enter") {
+        input.value += "\n";
+      } else {
+        input.value += text;
+      }
+      document.getElementById("charCount").textContent = `${input.value.length} characters`;
+    }
+
+    document.getElementById("clearSandboxBtn").addEventListener("click", () => {
+      document.getElementById("sandbox").value = "";
+      document.getElementById("charCount").textContent = "0 characters";
+    });
+
+    document.getElementById("sandbox").addEventListener("input", (e) => {
+      document.getElementById("charCount").textContent = `${e.target.value.length} characters`;
+    });
+
+    document.getElementById("clearBoardBtn").addEventListener("click", () => {
+      testedKeysSet.clear();
+      document.getElementById("testedCount").textContent = "0 / 80 Tested";
+      document.querySelectorAll(".keycap").forEach(k => k.classList.remove("hw-pressed", "hw-tested"));
+      document.getElementById("spotKey").textContent = "-";
+      document.getElementById("spotCode").textContent = "Scan Code: -";
+      document.getElementById("spotKeyCode").textContent = "-";
+      document.getElementById("spotHold").textContent = "Hold: -";
+      document.getElementById("termFeed").innerHTML = '<div style="color: #475569; text-align: center; padding: 2rem 0;">Log cleared. Waiting for keystrokes...</div>';
+      eventLogData.length = 0;
+      eventIndex = 0;
+      document.getElementById("eventCount").textContent = "0 events";
+    });
+
+    // CSV Export
+    document.getElementById("exportBtn").addEventListener("click", () => {
+      if (eventLogData.length === 0) return alert("No events recorded yet.");
+      const headers = ["Index", "Timestamp", "Type", "Key", "ScanCode", "Modifiers", "HoldDurationMs"];
+      const rows = eventLogData.map(e => [
+        e.idx,
+        `"${e.time}"`,
+        `"${e.type}"`,
+        `"${e.key.replace(/"/g, '""')}"`,
+        `"${e.code}"`,
+        `"${e.mods}"`,
+        `"${e.duration}"`
+      ]);
+      const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `glove80_telemetry_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+
+    // Modifiers & Telemetry
+    function updateModifiers(e) {
+      document.getElementById("modCtrl").classList.toggle("active", e.ctrlKey);
+      document.getElementById("modAlt").classList.toggle("active", e.altKey);
+      document.getElementById("modShift").classList.toggle("active", e.shiftKey);
+      document.getElementById("modCmd").classList.toggle("active", e.metaKey);
+    }
+
+    function getModifierString(e) {
+      const mods = [];
+      if (e.ctrlKey) mods.push("CTRL");
+      if (e.altKey) mods.push("ALT");
+      if (e.shiftKey) mods.push("SHIFT");
+      if (e.metaKey) mods.push("CMD");
+      return mods.length ? mods.join("+") : "-";
+    }
+
+    function highlightMatchingKeycap(keyStr, codeStr, isDown) {
+      const normalized = (keyStr || "").toUpperCase();
+      const allCaps = document.querySelectorAll(".keycap");
+
+      allCaps.forEach(cap => {
+        const m = (cap.dataset.keyMain || "").toUpperCase();
+        let match = false;
+        if (m === normalized) match = true;
+        else if (normalized === "BACKSPACE" && (m === "BKSP" || m === "DEL")) match = true;
+        else if (normalized === " " && (m === "SPACE" || cap.classList.contains("space-key"))) match = true;
+        else if (normalized === "ENTER" && m === "ENTER") match = true;
+        else if (normalized === "ESCAPE" && m === "ESC") match = true;
+        else if (normalized === "DELETE" && (m === "DEL" || m === "BKSP")) match = true;
+        else if (normalized === "TAB" && m === "TAB") match = true;
+        else if (codeStr.startsWith("Key") && codeStr.slice(3) === m) match = true;
+        else if (codeStr.startsWith("Digit") && codeStr.slice(5) === m) match = true;
+        else if (codeStr.startsWith("F") && codeStr === m) match = true;
+
+        if (match) {
+          if (isDown) {
+            cap.classList.add("hw-pressed", "hw-tested");
+            testedKeysSet.add(cap.dataset.pos || m);
+            document.getElementById("testedCount").textContent = `${testedKeysSet.size} / 80 Tested`;
+          } else {
+            cap.classList.remove("hw-pressed");
+          }
+        }
+      });
+    }
+
+    // Intelligent Live Layer State Tracking
+    let currentLiveLayer = 0;
+    const activeLayerHolds = new Map();
+
+    function setLiveLayer(layerIdx, reason = "") {
+      if (currentLiveLayer === layerIdx && !reason) return;
+      currentLiveLayer = layerIdx;
+      const names = { 0: "0 (Base)", 12: "12 (Tmux & Nav)", 13: "13 (Selection)", 15: "15 (Emojis)", 17: "17 (Numpad)", 19: "19 (World)", 21: "21 (QWERTY)", 22: "22 (Function)", 23: "23 (Magic)" };
+      const lName = names[layerIdx] || `Layer ${layerIdx}`;
+      document.getElementById("liveLayerText").textContent = `Live: ${lName} ${reason ? '(' + reason + ')' : ''}`;
+      switchLayer(layerIdx);
+    }
+
+    function checkLiveLayerState(e, isDown) {
+      const code = e.code;
+      const key = e.key;
+
+      if (isDown) {
+        if (code === "Space") {
+          activeLayerHolds.set("Space", 12);
+          setLiveLayer(12, "Space Hold");
+        } else if (code === "Tab" && !e.altKey && !e.metaKey) {
+          activeLayerHolds.set("Tab", 17);
+          setLiveLayer(17, "Tab Hold");
+        } else if (["{", "}", "[", "]", "<", ">", "|", "\\", "@", "$", "#", "^", "&", "*", "~"].includes(key)) {
+          setLiveLayer(17, "Symbol Active");
+        } else if (["à", "á", "â", "ä", "ã", "å", "è", "é", "ê", "ë", "ì", "í", "î", "ï", "ò", "ó", "ô", "ö", "õ", "ø", "ù", "ú", "û", "ü", "ñ", "ç", "ß", "€", "£", "¥", "₩", "¢", "§", "°"].includes(key)) {
+          setLiveLayer(19, "World Active");
+        }
+      } else {
+        if (code === "Space") activeLayerHolds.delete("Space");
+        else if (code === "Tab") activeLayerHolds.delete("Tab");
+
+        if (activeLayerHolds.size === 0) {
+          setLiveLayer(0, "");
+        } else {
+          const lastLayer = Array.from(activeLayerHolds.values()).pop();
+          setLiveLayer(lastLayer, "Layer Hold");
+        }
+      }
+    }
+
+    // Window Keydown / Keyup Listeners
+    window.addEventListener("keydown", (e) => {
+      if (e.code === "F5") e.preventDefault();
+      else if (e.code === "Tab" && document.activeElement !== document.getElementById("sandbox")) e.preventDefault();
+      else if (e.code === "Space" && document.activeElement === document.body) e.preventDefault();
+
+      updateModifiers(e);
+      if (e.repeat) return;
+
+      const now = performance.now();
+      if (!keyPressTimers.has(e.code)) keyPressTimers.set(e.code, now);
+      playClickSound();
+
+      const displayKey = e.key === " " ? "Space (0x20)" : (e.key === "Backspace" ? "Backspace (Delete)" : e.key);
+      document.getElementById("spotKey").textContent = displayKey;
+      document.getElementById("spotCode").textContent = `Scan Code: ${e.code}`;
+      document.getElementById("spotKeyCode").textContent = `Code: 0x${(e.keyCode || e.which).toString(16).toUpperCase()}`;
+      document.getElementById("spotHold").textContent = "Hold: active...";
+
+      highlightMatchingKeycap(e.key, e.code, true);
+      checkLiveLayerState(e, true);
+
+      // Append to Terminal Feed
+      eventIndex++;
+      document.getElementById("eventCount").textContent = `${eventIndex} events`;
+      const timeStr = new Date().toLocaleTimeString() + '.' + String(Date.now() % 1000).padStart(3, '0');
+      const mods = getModifierString(e);
+      
+      const evObj = { idx: eventIndex, time: timeStr, type: "DOWN", key: displayKey, code: e.code, mods: mods, duration: "-" };
+      eventLogData.unshift(evObj);
+      if (eventLogData.length > 300) eventLogData.pop();
+
+      const term = document.getElementById("termFeed");
+      if (eventIndex === 1) term.innerHTML = "";
+
+      const line = document.createElement("div");
+      line.className = "term-line";
+      line.innerHTML = `
+        <span class="term-down">▼ DN</span>
+        <span class="term-key">${displayKey}</span>
+        <span class="term-code">${e.code}</span>
+        <span class="term-time">${mods}</span>
+      `;
+      term.insertBefore(line, term.firstChild);
+      while (term.children.length > 50) term.removeChild(term.lastChild);
+    });
+
+    window.addEventListener("keyup", (e) => {
+      updateModifiers(e);
+
+      let holdDuration = "-";
+      if (keyPressTimers.has(e.code)) {
+        holdDuration = `${Math.round(performance.now() - keyPressTimers.get(e.code))}ms`;
+        keyPressTimers.delete(e.code);
+      }
+      document.getElementById("spotHold").textContent = `Hold: ${holdDuration}`;
+
+      highlightMatchingKeycap(e.key, e.code, false);
+      checkLiveLayerState(e, false);
+
+      eventIndex++;
+      document.getElementById("eventCount").textContent = `${eventIndex} events`;
+      const timeStr = new Date().toLocaleTimeString() + '.' + String(Date.now() % 1000).padStart(3, '0');
+      const displayKey = e.key === " " ? "Space (0x20)" : (e.key === "Backspace" ? "Backspace (Delete)" : e.key);
+      const mods = getModifierString(e);
+
+      const evObj = { idx: eventIndex, time: timeStr, type: "UP", key: displayKey, code: e.code, mods: mods, duration: holdDuration };
+      eventLogData.unshift(evObj);
+      if (eventLogData.length > 300) eventLogData.pop();
+
+      const term = document.getElementById("termFeed");
+      const line = document.createElement("div");
+      line.className = "term-line";
+      line.innerHTML = `
+        <span class="term-up">▲ UP</span>
+        <span class="term-key" style="opacity: 0.8;">${displayKey}</span>
+        <span class="term-code">${e.code}</span>
+        <span style="color: var(--amber);">${holdDuration}</span>
+      `;
+      term.insertBefore(line, term.firstChild);
+      while (term.children.length > 50) term.removeChild(term.lastChild);
+    });
+
+    // Blur reset
+    window.addEventListener("blur", () => {
+      document.querySelectorAll(".mod-pill").forEach(p => p.classList.remove("active"));
+      keyPressTimers.clear();
+      activeLayerHolds.clear();
+      setLiveLayer(0, "");
+      document.querySelectorAll(".keycap.hw-pressed").forEach(c => c.classList.remove("hw-pressed"));
+    });
+
+    // Initial render
+    render();
+  </script>
+</body>
+</html>

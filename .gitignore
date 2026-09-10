@@ -1,2 +1,5 @@
 *~
 *.uf2
+!artifacts/
+!artifacts/firmware/
+!artifacts/firmware/**/*.uf2
