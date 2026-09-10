@@ -69,7 +69,10 @@ def build_bindings(layout: dict) -> list[list[str]]:
 # Defines parsed out of the keymap's custom-behaviors blob
 # --------------------------------------------------------------------------
 
-DEFINE_RE = re.compile(r"^[ \t]*#define[ \t]+(\w+)[ \t]+(.+?)[ \t]*$", re.M)
+# Object-like defines, including bare ones such as `#define MACOS_USE_GACS`
+# (which have no value). Function-like macros such as `#define UNICODE(...)`
+# are deliberately not matched: the name is immediately followed by `(`.
+DEFINE_RE = re.compile(r"^[ \t]*#define[ \t]+(\w+)(?:[ \t]+(.+?))?[ \t]*$", re.M)
 
 
 def parse_defines(text: str) -> dict[str, str]:
@@ -86,7 +89,7 @@ def parse_defines(text: str) -> dict[str, str]:
         name = match.group(1)
         if name in guarded and name in found:
             continue
-        found[name] = re.sub(r"\s+//.*$", "", match.group(2)).strip()
+        found[name] = re.sub(r"\s+//.*$", "", match.group(2) or "").strip()
     return found
 
 
@@ -122,27 +125,122 @@ def branch(text: str, condition: str) -> str:
     return text[start:pos]
 
 
-def finger_mods(text: str) -> dict[str, str]:
-    """Resolve the per-finger modifiers for this keymap's OS setting.
+# --------------------------------------------------------------------------
+# OPERATING_SYSTEM branch resolution
+# --------------------------------------------------------------------------
 
-    OPERATING_SYSTEM is 'L' and MACOS_USE_GACS is defined, so both the
-    macOS-only Win/Ctrl swaps in the keymap are suppressed.
+DIRECTIVE_RE = re.compile(r"^[ \t]*#(if|ifdef|ifndef|elif|else|endif)\b[ \t]*(.*?)[ \t]*$")
+OS_DEFINE_RE = re.compile(r"^[ \t]*#define[ \t]+OPERATING_SYSTEM[ \t]+'(\w)'", re.M)
+
+
+def active_os(text: str) -> str:
+    """The operating system the keymap actually compiles for.
+
+    The first unconditional `#define OPERATING_SYSTEM` wins; the one inside
+    `#ifndef OPERATING_SYSTEM` is dead code whenever it is already defined.
     """
-    mods = {
-        "PINKY": "LALT",
-        "RING1": "LGUI",
-        "RING2": "RGUI",
-        "MIDDY": "LCTL",
-        "INDEX": "LSFT",
-    }
-    # Fail loudly if the keymap stops justifying the answer above.
-    assert "#define OPERATING_SYSTEM 'L'" in text, "OPERATING_SYSTEM changed off Linux"
-    assert "#define MACOS_USE_GACS" in text, "MACOS_USE_GACS no longer defined"
-    for finger, mod in mods.items():
-        assert f"#define {finger}_FINGER_MOD {mod}" in text or finger in (
-            "PINKY",
-            "MIDDY",
-        ), f"{finger}_FINGER_MOD is not a literal"
+    match = OS_DEFINE_RE.search(text)
+    return match.group(1) if match else "M"
+
+
+def _eval_os_condition(condition: str, os_char: str, defined: set[str]) -> bool:
+    expr = re.sub(r"OPERATING_SYSTEM\s*==\s*'(\w)'",
+                  lambda m: str(m.group(1) == os_char), condition)
+    expr = re.sub(r"!defined\(\s*(\w+)\s*\)",
+                  lambda m: str(m.group(1) not in defined), expr)
+    expr = re.sub(r"defined\(\s*(\w+)\s*\)",
+                  lambda m: str(m.group(1) in defined), expr)
+    expr = expr.replace("&&", " and ").replace("||", " or ")
+    try:
+        return bool(eval(expr, {"__builtins__": {}}, {}))  # noqa: S307
+    except Exception:
+        return True
+
+
+def defined_names(text: str) -> set[str]:
+    return {match.group(1) for match in DEFINE_RE.finditer(text)}
+
+
+def filter_os(text: str, os_char: str, defined: set[str]) -> str:
+    """Drop the *content* of OPERATING_SYSTEM branches that are not compiled.
+
+    Without this, define parsing sees every branch and the last one wins. That
+    happened to be right for Linux (the 'L' branches are textually last) but
+    silently wrong for macOS, which would report Ctrl instead of Cmd.
+
+    Directive lines themselves are always kept, even when their body is
+    dropped. Downstream code reads `#ifndef NAME` guards to work out which
+    definitions win, so removing those lines would break it. The result is a
+    define-extraction aid, not compilable C.
+    """
+    out: list[str] = []
+    stack: list[dict] = []
+
+    def all_active(entries: list[dict]) -> bool:
+        return all(entry["active"] for entry in entries)
+
+    for line in text.split("\n"):
+        match = DIRECTIVE_RE.match(line)
+        if not match:
+            if all_active(stack):
+                out.append(line)
+            continue
+        kind, rest = match.group(1), match.group(2).strip()
+        if kind in ("if", "ifdef", "ifndef"):
+            # Only OPERATING_SYSTEM conditionals are resolved here. Other
+            # guards are left alone (both branches kept) because a global
+            # defined-name set cannot answer them: #ifndef PINKY_FINGER_MOD is
+            # true at that point even though the name is defined inside it.
+            if kind == "ifdef":
+                is_os = rest == "OPERATING_SYSTEM"
+                value = (rest in defined) if is_os else True
+            elif kind == "ifndef":
+                is_os = rest == "OPERATING_SYSTEM"
+                value = (rest not in defined) if is_os else True
+            else:
+                is_os = "OPERATING_SYSTEM" in rest
+                value = _eval_os_condition(rest, os_char, defined) if is_os else True
+            stack.append({"os": is_os, "active": all_active(stack) and value,
+                          "taken": value})
+            out.append(line)
+            continue
+        if not stack:
+            out.append(line)
+            continue
+        top = stack[-1]
+        if kind == "elif":
+            if top["os"] and "OPERATING_SYSTEM" in rest:
+                value = _eval_os_condition(rest, os_char, defined)
+                top["active"] = all_active(stack[:-1]) and not top["taken"] and value
+                top["taken"] = top["taken"] or value
+            out.append(line)
+            continue
+        if kind == "else":
+            if top["os"]:
+                top["active"] = all_active(stack[:-1]) and not top["taken"]
+                top["taken"] = True
+            out.append(line)
+            continue
+        if kind == "endif":
+            stack.pop()
+            out.append(line)
+            continue
+    return "\n".join(out)
+
+
+def finger_mods(defines: dict[str, str]) -> dict[str, str]:
+    """Per-finger modifiers, read from the deflines of the compiled branch.
+
+    No assumptions about OPERATING_SYSTEM or MACOS_USE_GACS are needed: the
+    caller passes the result of filter_os(), so these are already resolved.
+    """
+    mods = {}
+    for finger in ("PINKY", "RING1", "RING2", "MIDDY", "INDEX"):
+        value = defines.get(f"{finger}_FINGER_MOD")
+        if not value:
+            raise SystemExit(
+                f"generate_field_guide: {finger}_FINGER_MOD unresolved after OS filtering")
+        mods[finger] = value
     return mods
 
 
@@ -154,7 +252,8 @@ def key_table(text: str) -> dict[str, str]:
     rather than as the digit zero.
     """
     body = branch(text, "#if defined(LAYER_ColemakDHm) && LAYER_ColemakDHm == 0")
-    table = dict(DEFINE_RE.findall(body))
+    table = {match.group(1): (match.group(2) or "").strip()
+             for match in DEFINE_RE.finditer(body)}
     return {k: ("" if v == "0" else v) for k, v in table.items()}
 
 
@@ -255,7 +354,7 @@ class Labeler:
         self.layer_names = layer_names
         self.table = key_table(text)
         self.chords = chord_table(text)
-        self.mods = finger_mods(text)
+        self.mods = finger_mods(defines)
         self.glyphs = glyphs(text)
         self.unknown: set[str] = set()
 
@@ -282,8 +381,9 @@ class Labeler:
                 return self.macro_expand(resolved, depth + 1)
         value = self.defines.get(expr)
         if value and value != expr:
-            if "(" in value:  # applied macro, e.g. _C(LEFT)
-                return value
+            # Object-like macros can expand to calls themselves (_REDO is
+            # _C(LS(Z)), _LOCK is _C(LC(Q))), so keep resolving rather than
+            # returning the raw text.
             return self.macro_expand(value, depth + 1)
         # function-style application: _C(K), _W(LEFT)
         match = re.fullmatch(r"(_\w+)\((.+)\)", expr)
@@ -359,8 +459,13 @@ class Labeler:
             out.update(tap=self.key_label(key_def),
                        hold=f"{KEY_NAMES.get(mod, mod)} + chord", kind="mod")
         elif re.fullmatch(r"&(?:left|right)_\w+_tap", behavior):
-            # plain-key taps used on the bilateral layers
-            out.update(tap=self.key_label(args[0]), kind="")
+            # Plain-key taps used on the bilateral layers.
+            resolved = self.key_label(first)
+            if resolved:
+                out.update(tap=resolved, kind="")
+            else:
+                # KEY_* set to 0 is the keymap's disabled placeholder.
+                out.update(tap="—", kind="disabled")
         elif behavior[1:] in self.defines and self.defines[behavior[1:]].startswith("kp "):
             out.update(tap=self.key_label(self.defines[behavior[1:]][3:].strip()), kind="")
         elif behavior in ("&plain",):
@@ -389,12 +494,11 @@ class Labeler:
                           "&extend_word", "&extend_line"):
             out.update(tap=behavior[1:].replace("_", " ").title(), kind="action")
         elif behavior == "&mod_tab":
-            out.update(tap=f"hold {self.key_label(args[0])} + Tab", kind="action")
-        elif behavior == "&linux_magic_sysrq":
-            out.update(tap="Magic SysRq (REISUB)", kind="action")
+            out.update(tap=f"hold {self.key_label(first)} + Tab", kind="action")
         elif behavior.startswith("&tmux_shortcut_"):
             suffix = behavior[len("&tmux_shortcut_"):]
-            out.update(tap=TMUX_NAMES.get(suffix, f"tmux: window {suffix}"), kind="action")
+            out.update(tap=TMUX_NAMES.get(suffix, "tmux: " + suffix.replace("_", " ")),
+                       kind="action")
         elif behavior in ("&bootloader",):
             out.update(tap="Bootloader", kind="action")
         elif behavior in ("&reset", "&sys_reset"):
@@ -535,7 +639,8 @@ render();
 def build_payload(layout: dict, text: str, bindings: list[list[str]],
                   geometry: dict, commit: str, sha256: str) -> dict:
     names = layout["layer_names"]
-    labeler = Labeler(text, parse_defines(text), names)
+    compiled = filter_os(text, active_os(text), defined_names(text))
+    labeler = Labeler(text, parse_defines(compiled), names)
 
     layers = []
     for li, (name, row) in enumerate(zip(names, bindings)):
@@ -561,6 +666,11 @@ def build_payload(layout: dict, text: str, bindings: list[list[str]],
                          + ", ".join(sorted(labeler.unknown)))
 
     letters = {k["tap"] for k in layers[0]["keys"] if re.fullmatch(r"[A-Za-z]", k["tap"] or "")}
+
+    blanks = [(layer["name"], i) for layer in layers
+              for i, key in enumerate(layer["keys"]) if not key["tap"]]
+    if blanks:
+        raise SystemExit(f"generate_field_guide: empty key labels at {blanks}")
     payload = {
         "meta": {
             "title": layout.get("title", "Glove80 layout"),
@@ -571,7 +681,7 @@ def build_payload(layout: dict, text: str, bindings: list[list[str]],
             "commit": commit,
             "sha256": sha256,
             "upstream": geometry["upstream"],
-            "timings": timings(text),
+            "timings": timings(compiled),
         },
         "layers": layers,
         "coords": geometry["coords"],
