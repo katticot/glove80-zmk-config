@@ -8,7 +8,7 @@ This repository is the single source of truth for this Glove80 configuration.
 | `config/keymap.json` | Glove80 Layout Editor re-import export. A mirror, not an authority: the Field Guide generator fails if any key, layer, or the title disagrees with the keymap. |
 | `config/` | Remaining ZMK build configuration (`default.nix`, `info.json`, `glove80.conf`). |
 | `docs/glove80.html` | Interactive Field Guide, generated from `config/glove80.keymap`. |
-| `docs/glove80-before-after.html` | Before/after key diff between two revisions of the keymap. Regenerate with `python3 tools/make_before_after.py --before <rev>`. |
+| `docs/glove80-before-after.html` | Before/after key diff between two revisions of the keymap. Regenerate with `uv run tools/make_before_after.py --before <rev>`. |
 | `docs/reference/` | Personal guide, layer reference, historical layout snapshots, and live v38 verification notes. |
 | `tools/generate_field_guide.py` | Builds `docs/glove80.html`; `--check` fails if it is stale or the mirror disagrees. |
 | `tools/make_before_after.py` | Builds `docs/glove80-before-after.html` from two revisions of the keymap. |
@@ -115,7 +115,7 @@ knowing before comparing it against upstream:
 Editor export are both derived from it, so firmware and documentation are
 reconciled by editing the keymap, never the generated files:
 
-* `python3 tools/generate_field_guide.py` rebuilds `docs/glove80.html`, and
+* `uv run tools/generate_field_guide.py` rebuilds `docs/glove80.html`, and
   `--check` fails if the committed page is stale. The page records the commit
   and SHA-256 of the keymap it was built from, so it does not go stale silently.
 * That same run verifies `config/keymap.json` against the keymap and fails on
@@ -154,6 +154,30 @@ not build.
 * **A Layout Editor export restores the deleted tree** unless the missing layers
 are also deleted in the editor. Hand edits to the keymap are not visible to it.
 
+## Running the tools
+
+Use `uv`, not the `python3` that happens to be on PATH:
+
+```
+uv run tools/generate_field_guide.py --check
+uv run tools/make_before_after.py --before 856a4ff
+uv run tools/glove80_key_probe.py
+```
+
+The tools are standard library only, so there is nothing to install. The reason to
+run them through uv anyway is the interpreter. `.python-version` pins 3.13, and uv
+supplies its own build of it; the ambient `python3` here is Homebrew's 3.14, whose
+build has no `tkinter` at all, so the key probe dies there with
+`No module named '_tkinter'`. `uv run` reads `.python-version`, creates `.venv`
+on first use, and never touches the ambient interpreter.
+
+`uv run python` gives you that same interpreter for one-off commands:
+
+```
+uv run python -c "import tkinter; print(tkinter.TkVersion)"
+uv python install 3.12          # add another version on demand
+```
+
 ## Reviewing what changed
 
 `docs/glove80-before-after.html` renders two revisions of the keymap against each
@@ -162,8 +186,8 @@ previous binding shown under each. It labels both sides with the same code the
 Field Guide uses, so a key reads there exactly as the Field Guide would show it.
 
 ```
-python3 tools/make_before_after.py --before 856a4ff      # the whole consolidation
-python3 tools/make_before_after.py --before HEAD~1       # just the last keymap edit
+uv run tools/make_before_after.py --before 856a4ff       # the whole consolidation
+uv run tools/make_before_after.py --before HEAD~1        # just the last keymap edit
 ```
 
 `--before` defaults to `856a4ff`, the last build before the layer consolidation,

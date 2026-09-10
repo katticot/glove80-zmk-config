@@ -1,0 +1,12 @@
+# There is nothing to install: every tool in tools/ is standard library only.
+# This file exists to pin the interpreter, because which python3 you happen to
+# have on PATH decides whether the tools work. The ambient one here is
+# Homebrew's 3.14, whose build ships no tkinter, so tools/glove80_key_probe.py
+# fails there with "No module named '_tkinter'". Running through uv uses the
+# interpreter named in .python-version instead, and uv's builds include tkinter.
+[project]
+name = "glove80-keymap-tools"
+version = "0.0.0"
+description = "Generators for the Glove80 Field Guide and its before/after diff"
+requires-python = ">=3.9"
+dependencies = []

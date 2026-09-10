@@ -11,7 +11,7 @@ a second authority: every run checks it against the keymap and fails if a cell,
 a layer, or the title disagrees.
 
 Usage:
-    python3 tools/generate_field_guide.py [--check]
+    uv run tools/generate_field_guide.py [--check]
 
 --check regenerates into memory and fails if docs/glove80.html differs,
 without writing.

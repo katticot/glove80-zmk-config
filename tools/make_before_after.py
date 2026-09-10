@@ -7,7 +7,7 @@ labels come from the same code the Field Guide uses, so whatever that page says
 about a key is what this page compares.
 
 Usage:
-    python3 tools/make_before_after.py [--before REV] [--after REV]
+    uv run tools/make_before_after.py [--before REV] [--after REV]
 
 --before defaults to 856a4ff, the last build before the layer consolidation:
 24 layers, the World/Emoji tree, and the Lower layer that held the keypad.
@@ -280,7 +280,7 @@ dl#detail dd{{margin:4px 0 0}}dd.absent{{color:var(--muted);font-style:italic}}
     <p><code>tools/make_before_after.py</code> reads both revisions of the keymap, labels
     them with the Field Guide generator, and writes this page. Regenerate it after any
     keymap change:</p>
-    <pre><code>python3 tools/make_before_after.py --before {m['before_rev'][:7]}</code></pre>
+    <pre><code>uv run tools/make_before_after.py --before {m['before_rev'][:7]}</code></pre>
     <p>Before <code>{m['before_sha']}</code>, after <code>{m['after_sha']}</code>.</p>
   </details>
 </main>

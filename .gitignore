@@ -7,3 +7,6 @@
 # Bytecode from tools/ importing each other (make_before_after imports
 # generate_field_guide), not source.
 __pycache__/
+
+# uv project environment
+.venv/
