@@ -78,6 +78,7 @@
 #define LAYER_Gaming 14
 #define LAYER_Factory 15
 #define LAYER_Magic 16
+#define LAYER_Cursor 17
 /* To deal with the situation where there is no Lower layer, to keep &lower happy */
 #ifndef LAYER_Lower
 #define LAYER_Lower 0
@@ -1241,7 +1242,7 @@ combos {
     combo_alt_tab_switcher {
         timeout-ms = <COMBO_FIRING_DECAY>;
         key-positions = <POS_LH_T4 POS_LH_T1>;
-        bindings = <&mod_tab_chord _A_TAB 0>;
+        bindings = <&mod_tab_chord _A_TAB LAYER_Cursor>;
         layers = <0 1 2 3 4 5 6 7 8>;
     };
     #endif
@@ -1249,7 +1250,7 @@ combos {
     combo_ctrl_tab_switcher {
         timeout-ms = <COMBO_FIRING_DECAY>;
         key-positions = <POS_LH_T4 POS_LH_T5>;
-        bindings = <&mod_tab_chord LCTL 0>;
+        bindings = <&mod_tab_chord LCTL LAYER_Cursor>;
         layers = <0 1 2 3 4 5 6 7 8>;
     };
 
@@ -10804,7 +10805,7 @@ UNICODE_MORPH_MODS
                     &kp GRAVE                             &kp Q  &LeftRing2 (W, LAYER_ColemakDHm)                             &kp F                             &kp P                  &kp B                                                                                                                                                                                  &kp J                              &kp L                              &kp U  &RightRing2 (Y, LAYER_ColemakDHm)                           &kp SEMI                     &kp MINUS
                    &caps_word  &LeftPinky (A, LAYER_ColemakDHm)  &LeftRing1 (R, LAYER_ColemakDHm)  &LeftMiddy (S, LAYER_ColemakDHm)  &LeftIndex (T, LAYER_ColemakDHm)  &plain LAYER_Typing G                                                                                                                                                                  &plain LAYER_Typing M  &RightIndex (N, LAYER_ColemakDHm)  &RightMiddy (E, LAYER_ColemakDHm)  &RightRing1 (I, LAYER_ColemakDHm)  &RightPinky (O, LAYER_ColemakDHm)                       &kp SQT
  &sticky_key_modtap LSFT LSFT                             &kp Z                             &kp X                             &kp C                             &kp D                  &kp V                     &lower                   &kp UP                   &kp DOWN                &kp LEFT                 &kp RIGHT      &thumb LAYER_System ENTER                  &kp K                              &kp H                          &kp COMMA                            &kp DOT                           &kp FSLH  &sticky_key_modtap RSFT RSFT
-         &magic LAYER_Magic 0                          &kp HOME                         &kp PG_UP                         &kp PG_DN            &kp END                         &kp SPACE  &thumb LAYER_Number ESC  &kp DELETE  &kp TAB  &kp ENTER  &kp BACKSPACE                          &parang_left                           &kp LBKT                           &kp RBKT                      &parang_right          &magic LAYER_Magic 0
+         &magic LAYER_Magic 0                          &kp HOME                         &kp PG_UP                         &kp PG_DN            &kp END                         &space LAYER_Cursor SPACE &thumb LAYER_Number ESC  &kp DELETE  &kp TAB  &kp ENTER  &kp BACKSPACE                          &parang_left                           &kp LBKT                           &kp RBKT                      &parang_right          &magic LAYER_Magic 0
             >;
         };
 
@@ -10988,6 +10989,17 @@ UNICODE_MORPH_MODS
  &bootloader  &rgb_ug RGB_SPD  &rgb_ug RGB_SAD  &rgb_ug RGB_HUD  &rgb_ug RGB_BRD  &rgb_ug RGB_EFF                                                               &none   &none   &none   &none   &none     &bootloader
   &sys_reset            &none            &none            &none            &none            &none   &bt_2   &bt_3  &tog LAYER_Factory   &none   &none   &none   &none   &none   &none   &none   &none      &sys_reset
        &none            &none            &none            &none            &none                    &bt_0   &bt_1        &out OUT_USB   &none   &none   &none           &none   &none   &none   &none           &none
+            >;
+        };
+
+        layer_Cursor {
+            bindings = <
+     &none               &none               &none               &none               &none                                                                                                                                           &none                    &none                    &none                    &none        &none
+   &kp ESC             &kp RET           &kp SPACE             &kp TAB             &kp DEL     &kp INS                                                                                                    &kp INS                  &kp DEL                  &kp TAB                &kp SPACE                  &kp RET      &kp ESC
+ &kp _C(K)           &sk LSHFT           &kp _REDO           &kp _UNDO            &kp BSPC    &kp _CUT                                                                                                   &kp _CUT  &tmux_shortcut_window_1  &tmux_shortcut_window_2  &tmux_shortcut_window_3  &tmux_shortcut_window_4    &kp _C(K)
+ &kp _C(L)  &kp LEFT_PINKY_MOD  &kp LEFT_RING1_MOD  &kp LEFT_MIDDY_MOD  &kp LEFT_INDEX_MOD   &kp _COPY                                                                                                  &kp _COPY                 &kp LEFT                   &kp UP                 &kp DOWN                &kp RIGHT    &kp _C(L)
+ &kp _C(J)           &kp _C(A)        &select_line        &select_word           &kp _FIND  &kp _PASTE  &mod_tab _A_TAB  &mod_tab _G_TAB            &kp TAB  &select_none  &extend_line  &extend_word  &kp _PASTE                 &kp HOME                &kp PG_UP                &kp PG_DN                  &kp END    &kp _C(J)
+ &kp _C(H)      &kp _FIND_PREV        &extend_line        &extend_word      &kp _FIND_NEXT                        &none    &mod_tab LCTL  &tog LAYER_Cursor     &kp _C(A)  &select_line  &select_word                            &kp _FIND           &kp _FIND_PREV           &kp _FIND_NEXT                &kp _C(H)  &kp LG(DOT)
             >;
         };
 
