@@ -73,19 +73,11 @@
 #define LAYER_RightRing2 9
 #define LAYER_RightMiddy 10
 #define LAYER_RightIndex 11
-#define LAYER_Cursor 12
-#define LAYER_Number 13
-#define LAYER_Function 14
-#define LAYER_Emoji 15
-#define LAYER_Symbol 16
-#define LAYER_Mouse 17
-#define LAYER_System 18
-#define LAYER_World 19
-#define LAYER_Gaming 20
-#define LAYER_Factory 21
-#define LAYER_Lower 22
-#define LAYER_Magic 23
-
+#define LAYER_Number 12
+#define LAYER_System 13
+#define LAYER_Gaming 14
+#define LAYER_Factory 15
+#define LAYER_Magic 16
 /* To deal with the situation where there is no Lower layer, to keep &lower happy */
 #ifndef LAYER_Lower
 #define LAYER_Lower 0
@@ -1248,7 +1240,7 @@ combos {
     combo_alt_tab_switcher {
         timeout-ms = <COMBO_FIRING_DECAY>;
         key-positions = <POS_LH_T4 POS_LH_T1>;
-        bindings = <&mod_tab_chord _A_TAB LAYER_Cursor>;
+        bindings = <&mod_tab_chord _A_TAB 0>;
         layers = <0 1 2 3 4 5 6 7 8>;
     };
     #endif
@@ -1256,7 +1248,7 @@ combos {
     combo_ctrl_tab_switcher {
         timeout-ms = <COMBO_FIRING_DECAY>;
         key-positions = <POS_LH_T4 POS_LH_T5>;
-        bindings = <&mod_tab_chord LCTL LAYER_Cursor>;
+        bindings = <&mod_tab_chord LCTL 0>;
         layers = <0 1 2 3 4 5 6 7 8>;
     };
 
@@ -10811,7 +10803,7 @@ UNICODE_MORPH_MODS
                     &kp GRAVE                             &kp Q  &LeftRing2 (W, LAYER_ColemakDHm)                             &kp F                             &kp P                  &kp B                                                                                                                                                                                  &kp J                              &kp L                              &kp U  &RightRing2 (Y, LAYER_ColemakDHm)                           &kp SEMI                     &kp MINUS
                    &caps_word  &LeftPinky (A, LAYER_ColemakDHm)  &LeftRing1 (R, LAYER_ColemakDHm)  &LeftMiddy (S, LAYER_ColemakDHm)  &LeftIndex (T, LAYER_ColemakDHm)  &plain LAYER_Typing G                                                                                                                                                                  &plain LAYER_Typing M  &RightIndex (N, LAYER_ColemakDHm)  &RightMiddy (E, LAYER_ColemakDHm)  &RightRing1 (I, LAYER_ColemakDHm)  &RightPinky (O, LAYER_ColemakDHm)                       &kp SQT
  &sticky_key_modtap LSFT LSFT                             &kp Z                             &kp X                             &kp C                             &kp D                  &kp V                     &lower                   &kp UP                   &kp DOWN                &kp LEFT                 &kp RIGHT      &thumb LAYER_System ENTER                  &kp K                              &kp H                          &kp COMMA                            &kp DOT                           &kp FSLH  &sticky_key_modtap RSFT RSFT
-         &magic LAYER_Magic 0                          &kp HOME                         &kp PG_UP                         &kp PG_DN            &thumb LAYER_Emoji END                         &space LAYER_Cursor SPACE  &thumb LAYER_Number ESC  &thumb LAYER_Lower DELETE  &thumb LAYER_Mouse TAB  &thumb LAYER_Mouse ENTER  &thumb LAYER_Symbol BACKSPACE                          &thumb_parang_left LAYER_World 0                           &kp LBKT                           &kp RBKT                      &parang_right          &magic LAYER_Magic 0
+         &magic LAYER_Magic 0                          &kp HOME                         &kp PG_UP                         &kp PG_DN            &kp END                         &kp SPACE  &thumb LAYER_Number ESC  &kp DELETE  &kp TAB  &kp ENTER  &kp BACKSPACE                          &parang_left                           &kp LBKT                           &kp RBKT                      &parang_right          &magic LAYER_Magic 0
             >;
         };
 
@@ -10936,16 +10928,6 @@ UNICODE_MORPH_MODS
             >;
         };
 
-        layer_Cursor {
-            bindings = <
-     &none               &none               &none               &none               &none                                                                                                                                           &none                    &none                    &none                    &none        &none
-   &kp ESC             &kp RET           &kp SPACE             &kp TAB             &kp DEL     &kp INS                                                                                                    &kp INS                  &kp DEL                  &kp TAB                &kp SPACE                  &kp RET      &kp ESC
- &kp _C(K)           &sk LSHFT           &kp _REDO           &kp _UNDO            &kp BSPC    &kp _CUT                                                                                                   &kp _CUT  &tmux_shortcut_window_1  &tmux_shortcut_window_2  &tmux_shortcut_window_3  &tmux_shortcut_window_4    &kp _C(K)
- &kp _C(L)  &kp LEFT_PINKY_MOD  &kp LEFT_RING1_MOD  &kp LEFT_MIDDY_MOD  &kp LEFT_INDEX_MOD   &kp _COPY                                                                                                  &kp _COPY                 &kp LEFT                   &kp UP                 &kp DOWN                &kp RIGHT    &kp _C(L)
- &kp _C(J)           &kp _C(A)        &select_line        &select_word           &kp _FIND  &kp _PASTE  &mod_tab _A_TAB  &mod_tab _G_TAB            &kp TAB  &select_none  &extend_line  &extend_word  &kp _PASTE                 &kp HOME                &kp PG_UP                &kp PG_DN                  &kp END    &kp _C(J)
- &kp _C(H)      &kp _FIND_PREV        &extend_line        &extend_word      &kp _FIND_NEXT                        &none    &mod_tab LCTL  &tog LAYER_Cursor     &kp _C(A)  &select_line  &select_word                            &kp _FIND           &kp _FIND_PREV           &kp _FIND_NEXT                &kp _C(H)  &kp LG(DOT)
-            >;
-        };
 
         layer_Number {
             bindings = <
@@ -10958,49 +10940,9 @@ UNICODE_MORPH_MODS
             >;
         };
 
-        layer_Function {
-            bindings = <
-    &none               &none               &none               &none               &none                                                                                                                  &none         &none         &none          &none           &none
-  &kp ESC             &kp RET           &kp SPACE             &kp TAB             &kp DEL  &kp INS                                                                               &kp C_MEDIA_HOME     &kp C_PLAY    &kp C_PREV    &kp C_NEXT     &kp C_STOP     &kp C_EJECT
-    &none           &sk LSHFT           &kp _REDO           &kp _UNDO            &kp BSPC    &none                                                                                     &kp K_CALC         &kp F7        &kp F8        &kp F9        &kp F10         &kp F13
- &kp CAPS  &kp LEFT_PINKY_MOD  &kp LEFT_RING1_MOD  &kp LEFT_MIDDY_MOD  &kp LEFT_INDEX_MOD    &none                                                                                      &kp K_WWW         &kp F4        &kp F5        &kp F6        &kp F11         &kp F14
-    &none           &kp _C(A)        &select_line        &select_word               &none    &none   &none   &none                &none  &kp C_PREV    &kp C_NEXT      &kp C_PP    &kp C_AL_FILES         &kp F1        &kp F2        &kp F3        &kp F12         &kp F15
-    &none               &none        &extend_line        &extend_word               &none            &none   &none  &tog LAYER_Function  &kp C_MUTE  &kp C_VOL_DN  &kp C_VOL_UP                    &kp C_BRI_MAX  &kp C_BRI_UP  &kp C_BRI_DN  &kp C_BRI_MIN  &kp C_BRI_AUTO
-            >;
-        };
 
-        layer_Emoji {
-            bindings = <
-            &emoji_cloudy     &emoji_mostly_cloudy           &emoji_partly_cloudy        &emoji_mostly_sunny                  &emoji_sunny                                                                                                                                                                                                    &emoji_new_moon      &emoji_moon_crescent         &emoji_moon_quarter         &emoji_moon_gibbous         &emoji_full_moon
-          &emoji_rainbow    &emoji_light_skin_tone  &emoji_medium_light_skin_tone    &emoji_medium_skin_tone  &emoji_medium_dark_skin_tone  &emoji_dark_skin_tone                                                                                                                                                     &emoji_tada                &emoji_heart               &emoji_fire               &emoji_muscle      &emoji_person_climbing          &emoji_lab_coat
-        &emoji_left_arrow              &emoji_bald                &emoji_red_hair          &emoji_curly_hair             &emoji_white_hair     &emoji_right_arrow                                                                                                                                               &emoji_face_laugh           &emoji_face_smile          &emoji_face_eyes            &emoji_face_joke            &emoji_face_fear     &emoji_face_surprise
-       &emoji_female_sign  &emoji_skin_tone_preset                     &emoji_zwj  &emoji_gender_sign_preset      &emoji_hair_style_preset       &emoji_male_sign                                                                                                                                        &emoji_gesture_attention     &emoji_gesture_approval  &emoji_gesture_gratitude      &emoji_gesture_anxiety      &emoji_gesture_despair   &emoji_gesture_curious
-         &emoji_old_woman             &emoji_woman                    &emoji_girl                 &emoji_boy                    &emoji_man         &emoji_old_man  &emoji_cityscape  &emoji_cityscape_dusk  &emoji_cityscape_night      &emoji_astronaut         &emoji_rocket      &emoji_moon_stars  &emoji_person_tipping_hand  &emoji_person_gesturing_ok      &emoji_person_bowing  &emoji_person_raising_hand  &emoji_person_gesturing_no  &emoji_person_shrugging
- &emoji_sunrise_mountains           &emoji_sunrise                    &emoji_baby         &emoji_baby_bottle                         &none                                &kp LSHFT                  &none        &tog LAYER_Emoji  &emoji_gesture_hands  &emoji_gesture_point  &emoji_gesture_thumbs                                         &emoji_checkoff                &emoji_100              &emoji_warning                    &emoji_x          &emoji_question
-            >;
-        };
 
-        layer_Symbol {
-            bindings = <
-         &none          &none         &none                 &none          &none                                                                                                                 &none                &none                &none                &none   &none
-         &none      &kp GRAVE     &kp EQUAL         &kp LS(MINUS)       &kp SEMI     &kp COMMA                                                                              &none                &none                &none                &none                &none   &none
-    &kp LS(N1)   &kp LS(BSLH)       &kp SQT  &kp LS(SINGLE_QUOTE)      &kp MINUS  &kp LS(FSLH)                                                                           &kp SEMI  &kp RIGHT_INDEX_MOD  &kp RIGHT_MIDDY_MOD  &kp RIGHT_RING1_MOD  &kp RIGHT_PINKY_MOD   &none
-    &kp LS(N3)     &kp LS(N6)    &kp LS(N9)            &kp LS(N0)     &kp LS(N4)    &kp LS(N8)                                                                            &kp DOT             &kp BSPC              &kp TAB            &kp SPACE              &kp RET   &none
- &kp LS(GRAVE)  &kp LS(COMMA)  &kp LS(LBKT)          &kp LS(RBKT)    &kp LS(DOT)      &kp FSLH    &kp BSLH       &kp DOT  &kp LS(N8)              &none   &none   &none  &kp FSLH              &kp DEL          &kp LS(TAB)                &none                &none   &none
-    &kp LS(N2)     &kp LS(N7)      &kp LBKT              &kp RBKT  &kp LS(EQUAL)                &kp LS(N5)  &kp LS(SEMI)    &kp SEMI  &tog LAYER_Symbol   &none   &none                         &trans               &trans               &trans               &trans   &none
-            >;
-        };
 
-        layer_Mouse {
-            bindings = <
-  &none   &none           &none           &none            &none                                                                                                   &none                &none                &none                &none   &none
-  &none   &none           &none           &none            &none   &none                                                                      &none                &none                &none                &none                &none   &none
-  &none   &none  &msc SCRL_LEFT    &mmv MOVE_UP  &msc SCRL_RIGHT   &none                                                                  &mkp MCLK  &kp RIGHT_INDEX_MOD  &kp RIGHT_MIDDY_MOD  &kp RIGHT_RING1_MOD  &kp RIGHT_PINKY_MOD   &none
-  &none   &none  &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_RIGHT   &none                                                                  &mkp LCLK       &mmv MOVE_LEFT         &mmv MOVE_UP       &mmv MOVE_DOWN      &mmv MOVE_RIGHT   &none
-  &none   &none           &none  &msc SCRL_DOWN     &msc SCRL_UP   &none  &mkp MCLK      &none   &none             &none   &none   &none  &mkp RCLK       &msc SCRL_LEFT         &msc SCRL_UP       &msc SCRL_DOWN      &msc SCRL_RIGHT   &none
-  &none   &none           &none           &none            &none          &mkp LCLK  &mkp RCLK   &none  &tog LAYER_Mouse   &none   &none                           &none                &none                &none                &none   &none
-            >;
-        };
 
         layer_System {
             bindings = <
@@ -11013,16 +10955,6 @@ UNICODE_MORPH_MODS
             >;
         };
 
-        layer_World {
-            bindings = <
-                &none                    &none                  &none                 &none                     &none                                                                                          &none      &none      &none      &none   &none
-                &none                    &none                  &none                 &none                     &none   &none                                                                       &none      &none      &none      &none      &none   &none
-                &none       &world_degree_sign          &world_y_base         &world_o_base             &world_u_base   &none                                                                       &none      &none   &kp LALT   &kp RALT      &none   &none
-                &none   &world_consonants_base          &world_i_base         &world_e_base             &world_a_base   &none                                                                       &none  &kp LSHFT  &kp LCTRL  &kp RCTRL  &kp RSHFT   &none
- &world_currency_base  &world_quotes_left_base    &world_exclaim_left  &world_question_left  &world_quotes_right_base   &none   &none   &none             &none             &none   &none   &none   &none      &none      &none      &none      &none   &none
-    &world_micro_sign      &world_section_sign  &world_paragraph_sign      &world_o_ordinal          &world_a_ordinal           &none   &none  &tog LAYER_World  &tog LAYER_World   &none   &none              &none      &none      &none      &none   &none
-            >;
-        };
 
         layer_Gaming {
             bindings = <
@@ -11046,16 +10978,6 @@ UNICODE_MORPH_MODS
             >;
         };
 
-        layer_Lower {
-            bindings = <
-         &kp C_BRI_DN  &kp C_BRI_UP      &kp C_PREV      &kp C_NEXT          &kp C_PP                                                                                                                                                   &kp C_MUTE  &kp C_VOL_DN  &kp C_VOL_UP            &none       &kp PAUSE_BREAK
-            &kp EQUAL         &none           &none           &none             &none   &kp HOME                                                                                                                      &kp LS(N9)        &kp KP_NUM  &kp KP_EQUAL  &kp KP_SLASH  &kp KP_MULTIPLY       &kp PRINTSCREEN
-              &kp TAB         &none           &none    &kp UP_ARROW             &none    &kp END                                                                                                                      &kp LS(N0)         &kp KP_N7     &kp KP_N8     &kp KP_N9     &kp KP_MINUS        &kp SCROLLLOCK
-              &kp ESC         &none  &kp LEFT_ARROW  &kp DOWN_ARROW   &kp RIGHT_ARROW  &kp PG_UP                                                                                                                      &kp LS(N5)         &kp KP_N4     &kp KP_N5     &kp KP_N6      &kp KP_PLUS            &kp KP_NUM
-            &kp GRAVE     &kp K_APP           &none         &kp F11           &kp F12  &kp PG_DN  &tog LAYER_Function  &tog LAYER_Typing  &tog LAYER_Gaming  &tog LAYER_Gaming  &tog LAYER_Typing  &tog LAYER_System   &kp COMMA         &kp KP_N1     &kp KP_N2     &kp KP_N3     &kp KP_ENTER              &kp LALT
- &magic LAYER_Magic 0      &kp CAPS         &kp INS         &kp F11  &tog LAYER_Emoji               &tog LAYER_Cursor  &tog LAYER_Number   &tog LAYER_Lower   &tog LAYER_Lower   &tog LAYER_Mouse  &tog LAYER_Symbol              &tog LAYER_World     &kp KP_N0    &kp KP_DOT     &kp KP_ENTER  &magic LAYER_Magic 0
-            >;
-        };
 
         layer_Magic {
             bindings = <
