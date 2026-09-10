@@ -8,6 +8,7 @@ This repository is the single source of truth for this Glove80 configuration.
 | `config/keymap.json` | Glove80 Layout Editor re-import export. A mirror, not an authority: the Field Guide generator fails if any key, layer, or the title disagrees with the keymap. |
 | `config/` | Remaining ZMK build configuration (`default.nix`, `info.json`, `glove80.conf`). |
 | `docs/glove80.html` | Interactive Field Guide, generated from `config/glove80.keymap`. |
+| `docs/glove80-before-after.html` | Before/after key diff between two revisions of the keymap. Regenerate with `python3 tools/make_before_after.py --before <rev>`. |
 | `docs/reference/` | Personal guide, layer reference, historical layout snapshots, and live v38 verification notes. |
 | `archive/keymaps/` | Earlier standalone keymap snapshot. |
 | `archive/layouts/` | Pre-Field-Guide layout inspector snapshot. |
@@ -123,3 +124,20 @@ gone while the editor still binds `&emoji_*` would produce an export that does
 not build.
 * **A Layout Editor export restores the deleted tree** unless the missing layers
 are also deleted in the editor. Hand edits to the keymap are not visible to it.
+
+## Reviewing what changed
+
+`docs/glove80-before-after.html` renders two revisions of the keymap against each
+other, key by key, with a tab per layer, changed keys highlighted, and the
+previous binding shown under each. It labels both sides with the same code the
+Field Guide uses, so a key reads there exactly as the Field Guide would show it.
+
+```
+python3 tools/make_before_after.py --before 856a4ff      # the whole consolidation
+python3 tools/make_before_after.py --before HEAD~1       # just the last keymap edit
+```
+
+`--before` defaults to `856a4ff`, the last build before the layer consolidation,
+and `--after` defaults to the working tree. Note that the diff follows `&trans`
+inheritance, so a base-layer change also shows up on the finger layers that
+inherit that position, which is what those layers will actually send.
