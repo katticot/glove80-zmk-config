@@ -12,8 +12,34 @@ This repository is the single source of truth for this Glove80 configuration.
 | `docs/reference/` | Personal guide, layer reference, historical layout snapshots, and live v38 verification notes. |
 | `archive/keymaps/` | Earlier standalone keymap snapshot. |
 | `archive/layouts/` | Pre-Field-Guide layout inspector snapshot. |
-| `artifacts/firmware/` | Current combined UF2 and its downloaded ZIP. |
-| `artifacts/firmware/legacy/` | Earlier Glorious Engrammer v38 UF2. |
+| `artifacts/firmware/glove80-current.uf2` | The current build: 18 layers, macOS. |
+| `artifacts/firmware/legacy/glorious-engrammer-v38.uf2` | The previous build, and what the keyboard ran before it: Sunaku's v38, 24 layers. |
+
+## Firmware
+
+| File | Layers | Bytes | SHA-256 |
+| --- | --- | --- | --- |
+| `artifacts/firmware/glove80-current.uf2` | 18 | 903,680 | `f2574ff50833e34c06fc981a3fbd81c26b709633d0b026d10094b6ee86eeec60` |
+| `artifacts/firmware/legacy/glorious-engrammer-v38.uf2` | 24 | 1,047,552 | `062f561d3e2956306cb184a51b6899ffa2ad699c67516ea2a3ffa320f36b2965` |
+
+Both are combined UF2s: the same file goes to each half. Flash the right half
+first (hold `#30`+`#79` for `GLV80RHBOOT`), then the left (`#64`+`#25` for
+`GLV80LHBOOT`). Rebuild with `gh workflow run Build --ref main` and replace
+`glove80-current.uf2` with the downloaded one.
+
+Nothing in `artifacts/` is an input to the build; it holds only builds kept for
+flashing and recovery, so the `legacy/` copy can be flashed to go back to the
+24-layer layout at any time.
+
+Two earlier builds were removed here because nothing referenced them and both
+were superseded: an 819,200-byte build (`d08634ee…`, the stale three-layer
+build) and a 309,233-byte ZIP (`d214d51d…`) whose payload was a *different*
+819,200-byte build (`9074079b…`). They are still in git history:
+
+```
+git log --oneline --all -- artifacts/firmware/glove80-current.uf2.zip
+git show <rev>:artifacts/firmware/glove80-current.uf2.zip > glove80.zip
+```
 
 ## Duplicate legacy download
 
