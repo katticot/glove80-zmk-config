@@ -446,11 +446,18 @@ WORLD_LABELS = {
 }
 
 
+def active_define(text: str, name: str) -> bool:
+    """True if `#define <name>` is present and not commented out."""
+    return bool(re.search(rf"^[ \t]*#define[ \t]+{name}\b", text, re.M))
+
+
 def timings(text: str) -> dict[str, int]:
     """Resolve the timing defines the Field Guide describes."""
     env = numeric_defines(parse_defines(text))
     out = {"tapping_resolution": env["TAPPING_RESOLUTION"],
-           "difficulty": env.get("DIFFICULTY_LEVEL", 0)}
+           "difficulty": env.get("DIFFICULTY_LEVEL", 0),
+           "index_streak": env.get("INDEX_STREAK_DECAY"),
+           "shift_forgiveness": active_define(text, "SHIFT_FORGIVENESS")}
     for name in ("HOMEY", "INDEX", "MIDDY", "RING1", "PINKY", "PLAIN", "THUMB",
                  "SPACE", "STICKY", "CHORD"):
         if f"{name}_HOLDING_TIME" in env:
@@ -638,7 +645,10 @@ def render_html(shell: str, payload: dict) -> str:
         f"Sticky one-shot keys: {t.get('sticky', '?')} ms. Tapping resolution "
         f"{t.get('tapping_resolution', '?')} ms (difficulty level {t.get('difficulty', '?')}). "
         "Home-row keys also hold their own finger layer, so a one-handed hold "
-        "falls back to a plain tap when ENFORCE_BILATERAL is set in the keymap.")
+        "falls back to a plain tap when ENFORCE_BILATERAL is set in the keymap. "
+        f"Shift forgiveness is {'on' if t.get('shift_forgiveness') else 'off'}; "
+        f"index streak decay {t.get('index_streak', '?')} ms "
+        "(0 = home-row shift stays available while typing fast).")
     html = re.sub(r'<p>Home-row holds:.*?</p>',
                   lambda m: "<p>" + timing_text + "</p>", html, flags=re.S)
 
