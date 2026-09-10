@@ -1,26 +1,22 @@
 /*
  * MoErgo Glove80 Clean Minimal Keymap (Colemak-DH + Bilateral HRM + Numpad/Nav + Magic)
- * Optimized & Verified for: Keita
- * 
- * Total Layers: 3 (Clean Architecture)
- *   0: Base (Colemak-DH Engrammer + Bilateral HRMs)
- *   1: Numpad & Directionals (Hold Tab T2 or Enter T6)
- *   2: Hardware Magic & Bluetooth (Press Magic Key LH C6R6)
+ * Authentic MoErgo Matrix Transform Order
  */
 
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/keys.h>
 #include <dt-bindings/zmk/bt.h>
-#include <dt-bindings/zmk/rgb.h>
+#include <dt-bindings/zmk/ext_power.h>
 #include <dt-bindings/zmk/outputs.h>
+#include <dt-bindings/zmk/rgb.h>
 
-#define LAYER_BASE   0
-#define LAYER_NUMNAV 1
-#define LAYER_MAGIC  2
+#define DEFAULT 0
+#define NUMNAV  1
+#define MAGIC   2
 
 / {
     behaviors {
-        // Left Hand Bilateral Home Row Modifiers
+        // Left Hand Bilateral Home Row Modifiers (Trigger only on Right Hand keys)
         lh_p_alt: lh_p_alt {
             compatible = "zmk,behavior-hold-tap";
             label = "LH_PINKY_ALT";
@@ -29,7 +25,7 @@
             tapping-term-ms = <280>;
             quick-tap-ms = <175>;
             bindings = <&kp>, <&kp>;
-            hold-trigger-key-positions = <5 6 7 8 9 16 17 18 19 20 21 28 29 30 31 32 33 40 41 42 43 44 45 58 59 60 61 62 63 76 77 78 79>;
+            hold-trigger-key-positions = <5 6 7 8 9 16 17 18 19 20 21 28 29 30 31 32 33 40 41 42 43 44 45 55 56 57 58 59 60 61 62 63 72 73 74 75 76 77 78 79>;
         };
 
         lh_r_gui: lh_r_gui {
@@ -40,7 +36,7 @@
             tapping-term-ms = <280>;
             quick-tap-ms = <175>;
             bindings = <&kp>, <&kp>;
-            hold-trigger-key-positions = <5 6 7 8 9 16 17 18 19 20 21 28 29 30 31 32 33 40 41 42 43 44 45 58 59 60 61 62 63 76 77 78 79>;
+            hold-trigger-key-positions = <5 6 7 8 9 16 17 18 19 20 21 28 29 30 31 32 33 40 41 42 43 44 45 55 56 57 58 59 60 61 62 63 72 73 74 75 76 77 78 79>;
         };
 
         lh_m_ctl: lh_m_ctl {
@@ -51,7 +47,7 @@
             tapping-term-ms = <280>;
             quick-tap-ms = <175>;
             bindings = <&kp>, <&kp>;
-            hold-trigger-key-positions = <5 6 7 8 9 16 17 18 19 20 21 28 29 30 31 32 33 40 41 42 43 44 45 58 59 60 61 62 63 76 77 78 79>;
+            hold-trigger-key-positions = <5 6 7 8 9 16 17 18 19 20 21 28 29 30 31 32 33 40 41 42 43 44 45 55 56 57 58 59 60 61 62 63 72 73 74 75 76 77 78 79>;
         };
 
         lh_i_sft: lh_i_sft {
@@ -62,10 +58,10 @@
             tapping-term-ms = <280>;
             quick-tap-ms = <175>;
             bindings = <&kp>, <&kp>;
-            hold-trigger-key-positions = <5 6 7 8 9 16 17 18 19 20 21 28 29 30 31 32 33 40 41 42 43 44 45 58 59 60 61 62 63 76 77 78 79>;
+            hold-trigger-key-positions = <5 6 7 8 9 16 17 18 19 20 21 28 29 30 31 32 33 40 41 42 43 44 45 55 56 57 58 59 60 61 62 63 72 73 74 75 76 77 78 79>;
         };
 
-        // Right Hand Bilateral Home Row Modifiers
+        // Right Hand Bilateral Home Row Modifiers (Trigger only on Left Hand keys)
         rh_i_sft: rh_i_sft {
             compatible = "zmk,behavior-hold-tap";
             label = "RH_IDX_SFT";
@@ -74,7 +70,7 @@
             tapping-term-ms = <280>;
             quick-tap-ms = <175>;
             bindings = <&kp>, <&kp>;
-            hold-trigger-key-positions = <0 1 2 3 4 10 11 12 13 14 15 22 23 24 25 26 27 34 35 36 37 38 39 46 47 48 49 50 51 64 65 66 67 68 69 70 71 72 73 74 75>;
+            hold-trigger-key-positions = <0 1 2 3 4 10 11 12 13 14 15 22 23 24 25 26 27 34 35 36 37 38 39 46 47 48 49 50 51 52 53 54 64 65 66 67 68 69 70 71>;
         };
 
         rh_m_ctl: rh_m_ctl {
@@ -85,7 +81,7 @@
             tapping-term-ms = <280>;
             quick-tap-ms = <175>;
             bindings = <&kp>, <&kp>;
-            hold-trigger-key-positions = <0 1 2 3 4 10 11 12 13 14 15 22 23 24 25 26 27 34 35 36 37 38 39 46 47 48 49 50 51 64 65 66 67 68 69 70 71 72 73 74 75>;
+            hold-trigger-key-positions = <0 1 2 3 4 10 11 12 13 14 15 22 23 24 25 26 27 34 35 36 37 38 39 46 47 48 49 50 51 52 53 54 64 65 66 67 68 69 70 71>;
         };
 
         rh_r_gui: rh_r_gui {
@@ -96,7 +92,7 @@
             tapping-term-ms = <280>;
             quick-tap-ms = <175>;
             bindings = <&kp>, <&kp>;
-            hold-trigger-key-positions = <0 1 2 3 4 10 11 12 13 14 15 22 23 24 25 26 27 34 35 36 37 38 39 46 47 48 49 50 51 64 65 66 67 68 69 70 71 72 73 74 75>;
+            hold-trigger-key-positions = <0 1 2 3 4 10 11 12 13 14 15 22 23 24 25 26 27 34 35 36 37 38 39 46 47 48 49 50 51 52 53 54 64 65 66 67 68 69 70 71>;
         };
 
         rh_p_alt: rh_p_alt {
@@ -107,7 +103,7 @@
             tapping-term-ms = <280>;
             quick-tap-ms = <175>;
             bindings = <&kp>, <&kp>;
-            hold-trigger-key-positions = <0 1 2 3 4 10 11 12 13 14 15 22 23 24 25 26 27 34 35 36 37 38 39 46 47 48 49 50 51 64 65 66 67 68 69 70 71 72 73 74 75>;
+            hold-trigger-key-positions = <0 1 2 3 4 10 11 12 13 14 15 22 23 24 25 26 27 34 35 36 37 38 39 46 47 48 49 50 51 52 53 54 64 65 66 67 68 69 70 71>;
         };
 
         // Thumb Layer-Tap Behaviors
@@ -130,86 +126,88 @@
             quick-tap-ms = <150>;
             bindings = <&mo>, <&kp>;
         };
+
+        magic: magic_hold_tap {
+            compatible = "zmk,behavior-hold-tap";
+            label = "MAGIC_HOLD_TAP";
+            #binding-cells = <2>;
+            flavor = "tap-preferred";
+            tapping-term-ms = <200>;
+            bindings = <&mo>, <&rgb_ug_status_macro>;
+        };
+    };
+
+    macros {
+        rgb_ug_status_macro: rgb_ug_status_macro_0 {
+            label = "RGB_UG_STATUS";
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&rgb_ug RGB_STATUS>;
+        };
+
+        bt_0: bt_profile_macro_0 {
+            label = "BT_0";
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&out OUT_BLE>, <&bt BT_SEL 0>;
+        };
+
+        bt_1: bt_profile_macro_1 {
+            label = "BT_1";
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&out OUT_BLE>, <&bt BT_SEL 1>;
+        };
+
+        bt_2: bt_profile_macro_2 {
+            label = "BT_2";
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&out OUT_BLE>, <&bt BT_SEL 2>;
+        };
+
+        bt_3: bt_profile_macro_3 {
+            label = "BT_3";
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&out OUT_BLE>, <&bt BT_SEL 3>;
+        };
     };
 
     keymap {
         compatible = "zmk,keymap";
 
-        // ------------------------------------------------------------------------
-        // Layer 0: Base Layer (Colemak-DH Engrammer + Bilateral HRMs)
-        // ------------------------------------------------------------------------
-        layer_base {
+        default_layer {
             bindings = <
-                // Row 0: Function Row (10 keys)
-                &kp F1        &kp F2        &kp F3        &kp F4        &kp F5                  &kp F6        &kp F7        &kp F8        &kp F9        &kp F10
-                // Row 1: Number Row (12 keys)
-                &kp EQUAL     &kp N1        &kp N2        &kp N3        &kp N4        &kp N5    &kp N6        &kp N7        &kp N8        &kp N9        &kp N0        &kp MINUS
-                // Row 2: Top Row (12 keys)
-                &kp TAB       &kp Q         &kp W         &kp F         &kp P         &kp B     &kp J         &kp L         &kp U         &kp Y         &kp SQT       &kp BSLH
-                // Row 3: Home Row (12 keys)
-                &kp ESC       &lh_p_alt LALT A  &lh_r_gui LGUI R  &lh_m_ctl LCTRL S  &lh_i_sft LSHIFT T  &kp G    &kp M  &rh_i_sft RSHIFT N &rh_m_ctl RCTRL E  &rh_r_gui RGUI I  &rh_p_alt RALT O  &kp SEMI
-                // Row 4: Bottom Row (12 keys)
-                &kp GRAVE     &kp Z         &kp X         &kp C         &kp D         &kp V     &kp K         &kp H         &kp COMMA     &kp DOT       &kp FSLH      &kp PLUS
-                // Row 5: Inner / Matrix filler (10 keys: 5 LH + 5 RH)
-                &mo LAYER_MAGIC &kp HOME    &kp END       &kp LEFT      &kp RIGHT               &kp UP        &kp DOWN      &kp LBKT      &kp RBKT      &kp PG_UP
-                // Thumb Clusters (12 keys: 6 LH + 6 RH)
-                // Left Thumbs (T1..T6)
-                &kp ESC       &lt_tab_num LAYER_NUMNAV TAB &kp END
-                &kp SPACE     &kp BSPC      &lt_ent_num LAYER_NUMNAV RET
-                // Right Thumbs (T1..T6)
-                &kp SPACE     &kp DEL       &kp RCTRL
-                &kp RET       &kp RALT      &kp RGUI
+            &kp F1         &kp F2             &kp F3             &kp F4              &kp F5                                                                                                                 &kp F6              &kp F7             &kp F8             &kp F9             &kp F10
+            &kp EQUAL      &kp N1             &kp N2             &kp N3              &kp N4              &kp N5                                                                                     &kp N6      &kp N7              &kp N8             &kp N9             &kp N0             &kp MINUS
+            &kp TAB        &kp Q              &kp W              &kp F               &kp P               &kp B                                                                                      &kp J       &kp L               &kp U              &kp Y              &kp SQT            &kp BSLH
+            &kp ESC        &lh_p_alt LALT A   &lh_r_gui LGUI R   &lh_m_ctl LCTRL S   &lh_i_sft LSHIFT T  &kp G                                                                                      &kp H       &rh_i_sft RSHIFT N  &rh_m_ctl RCTRL E  &rh_r_gui RGUI I   &rh_p_alt RALT O   &kp SEMI
+            &kp GRAVE      &kp Z              &kp X              &kp C               &kp D               &kp V   &kp ESC     &lt_tab_num NUMNAV TAB &kp END     &kp SPACE &kp DEL   &kp RCTRL      &kp K       &kp M               &kp COMMA          &kp DOT            &kp FSLH           &kp PLUS
+            &magic MAGIC 0 &kp HOME           &kp END            &kp LEFT            &kp RIGHT                   &kp SPACE   &kp BSPC               &lt_ent_num NUMNAV RET &kp RET &kp RALT &kp RGUI           &kp UP              &kp DOWN           &kp LBKT           &kp RBKT           &kp PG_DN
             >;
         };
 
-        // ------------------------------------------------------------------------
-        // Layer 1: Directional Numpad & Symbols (Hold Tab / Enter)
-        // ------------------------------------------------------------------------
-        layer_numnav {
+        numnav_layer {
             bindings = <
-                // Row 0: Function Row (10 keys)
-                &trans        &trans        &trans        &trans        &trans                  &trans        &trans        &trans        &trans        &trans
-                // Row 1: Number Row (12 keys)
-                &trans        &trans        &trans        &trans        &trans        &trans    &kp EQUAL     &kp KP_SLASH  &kp KP_MULTIPLY &kp KP_MINUS &kp KP_PLUS  &trans
-                // Row 2: Top Row (12 keys)
-                &trans        &kp EXCL      &kp AT        &kp HASH      &kp DLLR      &kp PRCNT &kp KP_N7     &kp KP_N8     &kp KP_N9     &kp KP_PLUS   &kp KP_ASTERISK &trans
-                // Row 3: Home Row (12 keys)
-                &trans        &kp CARET     &kp AMPS      &kp STAR      &kp LPAR      &kp RPAR  &kp KP_N4     &kp KP_N5     &kp KP_N6     &kp KP_MINUS  &kp KP_ENTER  &trans
-                // Row 4: Bottom Row (12 keys)
-                &trans        &kp TILDE     &kp UNDER     &kp PLUS      &kp LBRC      &kp RBRC  &kp KP_N1     &kp KP_N2     &kp KP_N3     &kp KP_DOT    &kp KP_SLASH  &trans
-                // Row 5: Inner Reach (10 keys)
-                &trans        &trans        &trans        &trans        &trans                  &kp HOME      &kp END       &kp LEFT      &kp RIGHT     &kp PG_DN
-                // Thumb Clusters (12 keys)
-                &trans        &trans        &trans
-                &trans        &trans        &trans
-                &kp KP_N0     &kp KP_DOT    &kp KP_ENTER
-                &kp RET       &trans        &trans
+            &trans        &trans             &trans             &trans              &trans                                                                                                                  &trans              &trans             &trans             &trans             &trans
+            &trans        &trans             &trans             &trans              &trans              &trans                                                                                     &kp EQUAL   &kp KP_SLASH        &kp KP_MULTIPLY    &kp KP_MINUS       &kp KP_PLUS        &trans
+            &trans        &kp EXCL           &kp AT             &kp HASH            &kp DLLR            &kp PRCNT                                                                                  &kp KP_N7   &kp KP_N8           &kp KP_N9          &kp KP_PLUS        &kp KP_ASTERISK    &trans
+            &trans        &kp CARET          &kp AMPS           &kp STAR            &kp LPAR            &kp RPAR                                                                                   &kp KP_N4   &kp KP_N5           &kp KP_N6          &kp KP_MINUS       &kp KP_ENTER       &trans
+            &trans        &kp TILDE          &kp UNDER          &kp PLUS            &kp LBRC            &kp RBRC  &trans    &trans                 &trans      &kp KP_N0 &kp KP_DOT &kp KP_ENTER   &kp KP_N1   &kp KP_N2           &kp KP_N3          &kp KP_DOT         &kp KP_SLASH       &trans
+            &trans        &trans             &trans             &trans              &trans                        &trans    &trans                 &trans      &kp RET   &trans     &trans                     &kp HOME            &kp END            &kp LEFT           &kp RIGHT          &kp PG_UP
             >;
         };
 
-        // ------------------------------------------------------------------------
-        // Layer 2: Hardware Magic & Bluetooth (Tap Magic Key)
-        // ------------------------------------------------------------------------
-        layer_magic {
+        magic_layer {
             bindings = <
-                // Row 0: Function Row (10 keys)
-                &bootloader   &trans        &trans        &trans        &trans                  &trans        &trans        &trans        &trans        &bootloader
-                // Row 1: Number Row (12 keys)
-                &trans        &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &trans    &trans        &rgb_ug RGB_TOG &rgb_ug RGB_EFF &rgb_ug RGB_BRI &rgb_ug RGB_BRD &trans
-                // Row 2: Top Row (12 keys)
-                &trans        &bt BT_CLR    &bt BT_PRV    &bt BT_NXT    &trans        &trans    &out OUT_TOG  &out OUT_USB  &out OUT_BLE  &trans        &trans        &trans
-                // Row 3: Home Row (12 keys)
-                &trans        &trans        &trans        &trans        &trans        &trans    &trans        &trans        &trans        &trans        &trans        &trans
-                // Row 4: Bottom Row (12 keys)
-                &trans        &trans        &trans        &trans        &trans        &trans    &trans        &trans        &trans        &trans        &trans        &trans
-                // Row 5: Inner Reach (10 keys)
-                &trans        &trans        &trans        &trans        &trans                  &trans        &trans        &trans        &trans        &trans
-                // Thumb Clusters (12 keys)
-                &trans        &trans        &trans
-                &trans        &trans        &trans
-                &trans        &trans        &trans
-                &trans        &trans        &trans
+            &bt BT_CLR     &none              &none              &none               &none                                                                                                                  &none               &none              &none              &none              &bt BT_CLR_ALL
+            &none          &none              &none              &none               &none               &none                                                                                      &none       &none               &none              &none              &none              &none
+            &none          &rgb_ug RGB_SPI    &rgb_ug RGB_SAI    &rgb_ug RGB_HUI     &rgb_ug RGB_BRI     &rgb_ug RGB_TOG                                                                            &none       &none               &none              &none              &none              &none
+            &bootloader    &rgb_ug RGB_SPD    &rgb_ug RGB_SAD    &rgb_ug RGB_HUD     &rgb_ug RGB_BRD     &rgb_ug RGB_EFF                                                                            &none       &none               &none              &none              &none              &bootloader
+            &sys_reset     &none              &none              &none               &none               &none     &bt_2     &bt_3                  &none       &none     &none      &none          &none       &none               &none              &none              &none              &sys_reset
+            &none          &none              &none              &none               &none                         &bt_0     &bt_1                  &out OUT_USB &none    &none      &none                      &none               &none              &none              &none              &none
             >;
         };
     };
-};
+};\n
