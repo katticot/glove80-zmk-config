@@ -269,6 +269,32 @@ def defined_names(text: str) -> set[str]:
     return {match.group(1) for match in DEFINE_RE.finditer(text)}
 
 
+def top_level_defines(text: str) -> set[str]:
+    """Names defined unconditionally, outside any #if/#ifdef block.
+
+    These are the keymap's user-facing feature switches (OPERATING_SYSTEM,
+    USE_NUMPAD_KEYCODES, ENFORCE_BILATERAL, ...). Because they are defined
+    before anything can guard them, a `#ifdef NAME` on one of them has a
+    single unambiguous answer, unlike `#ifndef PINKY_FINGER_MOD`, which is
+    defined inside its own guard and so cannot be judged from a name set.
+    """
+    names: set[str] = set()
+    depth = 0
+    for line in text.split("\n"):
+        match = DIRECTIVE_RE.match(line)
+        if match:
+            kind = match.group(1)
+            if kind in ("if", "ifdef", "ifndef"):
+                depth += 1
+            elif kind == "endif":
+                depth = max(0, depth - 1)
+            continue
+        define = re.match(r"^[ \t]*#define[ \t]+(\w+)", line)
+        if define and depth == 0:
+            names.add(define.group(1))
+    return names
+
+
 def filter_os(text: str, os_char: str, defined: set[str]) -> str:
     """Drop the *content* of OPERATING_SYSTEM branches that are not compiled.
 
@@ -283,6 +309,7 @@ def filter_os(text: str, os_char: str, defined: set[str]) -> str:
     """
     out: list[str] = []
     stack: list[dict] = []
+    switches = top_level_defines(text)
 
     def all_active(entries: list[dict]) -> bool:
         return all(entry["active"] for entry in entries)
@@ -295,20 +322,23 @@ def filter_os(text: str, os_char: str, defined: set[str]) -> str:
             continue
         kind, rest = match.group(1), match.group(2).strip()
         if kind in ("if", "ifdef", "ifndef"):
-            # Only OPERATING_SYSTEM conditionals are resolved here. Other
-            # guards are left alone (both branches kept) because a global
-            # defined-name set cannot answer them: #ifndef PINKY_FINGER_MOD is
-            # true at that point even though the name is defined inside it.
+            # OPERATING_SYSTEM conditionals decide which OS's shortcuts are
+            # live; a top-level feature switch decides whether its whole block
+            # is live. Other guards are left alone (both branches kept) because
+            # a global defined-name set cannot answer them: #ifndef
+            # PINKY_FINGER_MOD is true at that point even though the name is
+            # defined inside it.
             if kind == "ifdef":
-                is_os = rest == "OPERATING_SYSTEM"
-                value = (rest in defined) if is_os else True
+                resolved = rest == "OPERATING_SYSTEM" or rest in switches
+                value = (rest in defined) if resolved else True
             elif kind == "ifndef":
-                is_os = rest == "OPERATING_SYSTEM"
-                value = (rest not in defined) if is_os else True
+                resolved = rest == "OPERATING_SYSTEM" or rest in switches
+                value = (rest not in defined) if resolved else True
             else:
-                is_os = "OPERATING_SYSTEM" in rest
-                value = _eval_os_condition(rest, os_char, defined) if is_os else True
-            stack.append({"os": is_os, "active": all_active(stack) and value,
+                resolved = "OPERATING_SYSTEM" in rest
+                value = _eval_os_condition(rest, os_char, defined) if resolved else True
+            stack.append({"resolved": resolved,
+                          "active": all_active(stack) and value,
                           "taken": value})
             out.append(line)
             continue
@@ -317,14 +347,14 @@ def filter_os(text: str, os_char: str, defined: set[str]) -> str:
             continue
         top = stack[-1]
         if kind == "elif":
-            if top["os"] and "OPERATING_SYSTEM" in rest:
+            if top["resolved"] and "OPERATING_SYSTEM" in rest:
                 value = _eval_os_condition(rest, os_char, defined)
                 top["active"] = all_active(stack[:-1]) and not top["taken"] and value
                 top["taken"] = top["taken"] or value
             out.append(line)
             continue
         if kind == "else":
-            if top["os"]:
+            if top["resolved"]:
                 top["active"] = all_active(stack[:-1]) and not top["taken"]
                 top["taken"] = True
             out.append(line)
