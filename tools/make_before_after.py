@@ -189,6 +189,11 @@ render();
 """
 
 
+def short(rev: str) -> str:
+    """A revision as a reader should see it."""
+    return "the working tree" if rev == "WORKTREE" else rev[:7]
+
+
 def render_html(payload: dict, shell: str) -> str:
     css = re.search(r"<style>(.*?)</style>", shell, re.S).group(1)
     m = payload["meta"]
@@ -233,7 +238,7 @@ dl#detail dd{{margin:4px 0 0}}dd.absent{{color:var(--muted);font-style:italic}}
       <div class="eyebrow">keymap diff</div>
       <h1>{m['changed_keys']} keys changed</h1>
       <p>Every one of the {m['after_layers']} × 80 positions, compared between
-      <code>{m['before_rev'][:7]}</code> and <code>{m['after_rev'][:7]}</code>. Both sides
+      <code>{short(m['before_rev'])}</code> and <code>{short(m['after_rev'])}</code>. Both sides
       are labelled by the same code that builds the Field Guide, so a key shows here
       exactly as that page would show it.</p>
     </div>

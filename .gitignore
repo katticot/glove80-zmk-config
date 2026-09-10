@@ -3,3 +3,7 @@
 !artifacts/
 !artifacts/firmware/
 !artifacts/firmware/**/*.uf2
+
+# Bytecode from tools/ importing each other (make_before_after imports
+# generate_field_guide), not source.
+__pycache__/
