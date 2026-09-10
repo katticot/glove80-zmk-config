@@ -130,11 +130,17 @@ def check_mirror(text: str, names: list[str], bindings: list[list[str]]) -> None
                      f"TITLE says {TITLE!r}")
     mirror_names = layout.get("layer_names") or []
     if mirror_names != names:
-        drift.append(f"layer names: mirror {mirror_names} != keymap {names}")
+        # Everything below indexes by layer position, so a name mismatch makes
+        # a cell-by-cell comparison meaningless: report the shape and stop.
+        raise SystemExit(
+            "generate_field_guide: config/keymap.json has drifted from "
+            "config/glove80.keymap. The keymap is the source of truth, so "
+            "re-export the layout from the Glove80 Layout Editor (or fix the "
+            "keymap) before generating the Field Guide:\n  "
+            f"mirror has {len(mirror_names)} layers: {mirror_names}\n  "
+            f"keymap has {len(names)} layers: {names}")
 
     rows = mirror_bindings(layout)
-    if len(rows) != len(names):
-        drift.append(f"layers: mirror has {len(rows)}, keymap has {len(names)}")
     for li, name in enumerate(names):
         if li >= len(rows):
             drift.append(f"layer {name}: missing from the mirror")
@@ -516,6 +522,18 @@ class Labeler:
         return name
 
     # -- whole bindings ---------------------------------------------------
+    def layer_name(self, token: str, behavior: str) -> str:
+        """Resolve a numeric layer reference, tolerating a stale mirror.
+
+        A layer number that no longer exists means the file naming it is out of
+        date, which is drift to report — not a crash.
+        """
+        index = int(token)
+        if not 0 <= index < len(self.layer_names):
+            self.unknown.add(f"{behavior} {token} (no layer at index {index})")
+            return f"#{index} (missing)"
+        return self.layer_names[index]
+
     def describe(self, binding: str, index: int, chain: list[str]) -> dict:
         match = re.match(r"(&\S+)\s*(.*)$", binding)
         if not match:
@@ -614,11 +632,12 @@ class Labeler:
         elif behavior == "&out":
             out.update(tap="USB output", kind="action")
         elif behavior == "&to":
-            name = self.layer_names[int(args[0])]
+            name = self.layer_name(args[0], "&to")
             out.update(tap=f"→ {name}", kind="layer")
         elif behavior == "&tog":
             token = args[0]
-            name = self.layer_names[int(token)] if token.isdigit() else token.replace("LAYER_", "")
+            name = (self.layer_name(token, "&tog") if token.isdigit()
+                    else token.replace("LAYER_", ""))
             out.update(tap=f"Toggle {name}", kind="layer")
         elif behavior == "&rgb_ug":
             out.update(tap=RGB_NAMES.get(args[0], args[0]), kind="action")
