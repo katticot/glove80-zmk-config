@@ -1,6 +1,6 @@
 /*
  * MoErgo Glove80 Clean Minimal Keymap (Colemak-DH + Bilateral HRM + Numpad/Nav + Magic)
- * Authentic MoErgo Matrix Transform Order
+ * Authentic Colemak-DH Alpha Mapping & MoErgo Matrix Order
  */
 
 #include <behaviors.dtsi>
@@ -179,33 +179,51 @@
 
         default_layer {
             bindings = <
+            // 0..9: Function Row (10 keys)
             &kp F1         &kp F2             &kp F3             &kp F4              &kp F5                                                                                                                 &kp F6              &kp F7             &kp F8             &kp F9             &kp F10
+            // 10..21: Number Row (12 keys)
             &kp EQUAL      &kp N1             &kp N2             &kp N3              &kp N4              &kp N5                                                                                     &kp N6      &kp N7              &kp N8             &kp N9             &kp N0             &kp MINUS
+            // 22..33: Top Row (12 keys)
             &kp TAB        &kp Q              &kp W              &kp F               &kp P               &kp B                                                                                      &kp J       &kp L               &kp U              &kp Y              &kp SQT            &kp BSLH
-            &kp ESC        &lh_p_alt LALT A   &lh_r_gui LGUI R   &lh_m_ctl LCTRL S   &lh_i_sft LSHIFT T  &kp G                                                                                      &kp H       &rh_i_sft RSHIFT N  &rh_m_ctl RCTRL E  &rh_r_gui RGUI I   &rh_p_alt RALT O   &kp SEMI
-            &kp GRAVE      &kp Z              &kp X              &kp C               &kp D               &kp V   &kp ESC     &lt_tab_num NUMNAV TAB &kp END     &kp SPACE &kp DEL   &kp RCTRL      &kp K       &kp M               &kp COMMA          &kp DOT            &kp FSLH           &kp PLUS
+            // 34..45: Home Row (12 keys: Colemak-DH A R S T G | M N E I O ;)
+            &kp ESC        &lh_p_alt LALT A   &lh_r_gui LGUI R   &lh_m_ctl LCTRL S   &lh_i_sft LSHIFT T  &kp G                                                                                      &kp M       &rh_i_sft RSHIFT N  &rh_m_ctl RCTRL E  &rh_r_gui RGUI I   &rh_p_alt RALT O   &kp SEMI
+            // 46..63: Bottom Row Alphas (6 LH: ` Z X C D V) + Upper Thumbs (3 LH + 3 RH) + Bottom Row Alphas (6 RH: K H , . / +) = 18 keys
+            &kp GRAVE      &kp Z              &kp X              &kp C               &kp D               &kp V   &kp ESC     &lt_tab_num NUMNAV TAB &kp END     &kp SPACE &kp DEL   &kp RCTRL      &kp K       &kp H               &kp COMMA          &kp DOT            &kp FSLH           &kp PLUS
+            // 64..79: LH Magic (Pos 64) + LH Reach (4 keys) + Lower Thumbs (3 LH + 3 RH) + RH Reach (5 keys) = 16 keys
             &magic MAGIC 0 &kp HOME           &kp END            &kp LEFT            &kp RIGHT                   &kp SPACE   &kp BSPC               &lt_ent_num NUMNAV RET &kp RET &kp RALT &kp RGUI           &kp UP              &kp DOWN           &kp LBKT           &kp RBKT           &kp PG_DN
             >;
         };
 
         numnav_layer {
             bindings = <
+            // 0..9: Function Row
             &trans        &trans             &trans             &trans              &trans                                                                                                                  &trans              &trans             &trans             &trans             &trans
+            // 10..21: Number Row
             &trans        &trans             &trans             &trans              &trans              &trans                                                                                     &kp EQUAL   &kp KP_SLASH        &kp KP_MULTIPLY    &kp KP_MINUS       &kp KP_PLUS        &trans
+            // 22..33: Top Row
             &trans        &kp EXCL           &kp AT             &kp HASH            &kp DLLR            &kp PRCNT                                                                                  &kp KP_N7   &kp KP_N8           &kp KP_N9          &kp KP_PLUS        &kp KP_ASTERISK    &trans
+            // 34..45: Home Row
             &trans        &kp CARET          &kp AMPS           &kp STAR            &kp LPAR            &kp RPAR                                                                                   &kp KP_N4   &kp KP_N5           &kp KP_N6          &kp KP_MINUS       &kp KP_ENTER       &trans
+            // 46..63: Bottom + Upper Thumbs
             &trans        &kp TILDE          &kp UNDER          &kp PLUS            &kp LBRC            &kp RBRC  &trans    &trans                 &trans      &kp KP_N0 &kp KP_DOT &kp KP_ENTER   &kp KP_N1   &kp KP_N2           &kp KP_N3          &kp KP_DOT         &kp KP_SLASH       &trans
+            // 64..79: Magic + Reach + Lower Thumbs
             &trans        &trans             &trans             &trans              &trans                        &trans    &trans                 &trans      &kp RET   &trans     &trans                     &kp HOME            &kp END            &kp LEFT           &kp RIGHT          &kp PG_UP
             >;
         };
 
         magic_layer {
             bindings = <
-            &bt BT_CLR     &none              &none              &none               &none                                                                                                                  &none               &none              &none              &none              &bt BT_CLR_ALL
-            &none          &none              &none              &none               &none               &none                                                                                      &none       &none               &none              &none              &none              &none
+            // 0..9: Function Row (Bootloader on F1 and F10)
+            &bootloader    &none              &none              &none               &none                                                                                                                  &none               &none              &none              &none              &bootloader
+            // 10..21: Number Row
+            &none          &none              &none              &none               &none               &none                                                                                      &none       &none               &none              &none              &none              &bt BT_CLR_ALL
+            // 22..33: Top Row
             &none          &rgb_ug RGB_SPI    &rgb_ug RGB_SAI    &rgb_ug RGB_HUI     &rgb_ug RGB_BRI     &rgb_ug RGB_TOG                                                                            &none       &none               &none              &none              &none              &none
+            // 34..45: Home Row
             &bootloader    &rgb_ug RGB_SPD    &rgb_ug RGB_SAD    &rgb_ug RGB_HUD     &rgb_ug RGB_BRD     &rgb_ug RGB_EFF                                                                            &none       &none               &none              &none              &none              &bootloader
+            // 46..63: Bottom + Upper Thumbs
             &sys_reset     &none              &none              &none               &none               &none     &bt_2     &bt_3                  &none       &none     &none      &none          &none       &none               &none              &none              &none              &sys_reset
+            // 64..79: Magic + Reach + Lower Thumbs
             &none          &none              &none              &none               &none                         &bt_0     &bt_1                  &out OUT_USB &none    &none      &none                      &none               &none              &none              &none              &none
             >;
         };
