@@ -325,7 +325,7 @@
 #define OPERATING_SYSTEM 'L' // choose 'L'inux, 'M'acOS, or 'W'indows
 #define DIFFICULTY_LEVEL  4  // 0:custom, 1:easy -> 5:hard (see below)
 #define ENFORCE_BILATERAL    // cancels single-handed home row mod+tap
-//#define SHIFT_FORGIVENESS  // requires 24.08-beta1 or newer firmware
+#define SHIFT_FORGIVENESS  // requires 24.08-beta1 or newer firmware
 #define WORLD_USE_COMPOSE    // use native Compose in place of Unicode
 // TIP: Add more setting overrides here instead of editing them below.
 
@@ -1559,7 +1559,7 @@ behaviors {
     // unintended activation of home row mods when you're actively typing.
     //
     #ifndef INDEX_STREAK_DECAY
-    #define INDEX_STREAK_DECAY (TAPPING_RESOLUTION - 50)
+    #define INDEX_STREAK_DECAY 0 // no streak decay for index holds (see INDEX_HOLDING_TYPE note)
     #endif
 
     //
@@ -2754,7 +2754,6 @@ behaviors {
         compatible = "zmk,behavior-hold-tap";
         flavor = LEFT_INDEX_HOLDING_TYPE;
         hold-trigger-key-positions = <RIGHT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
         tapping-term-ms = <LEFT_INDEX_HOLDING_TIME>;
         quick-tap-ms = <LEFT_INDEX_REPEAT_DECAY>;
         require-prior-idle-ms = <LEFT_INDEX_STREAK_DECAY>;
@@ -2771,7 +2770,6 @@ behaviors {
         compatible = "zmk,behavior-hold-tap";
         flavor = LEFT_INDEX_HOLDING_TYPE;
         hold-trigger-key-positions = <RIGHT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
         tapping-term-ms = <LEFT_INDEX_HOLDING_TIME>;
         quick-tap-ms = <LEFT_INDEX_REPEAT_DECAY>;
         require-prior-idle-ms = <LEFT_INDEX_STREAK_DECAY>;
@@ -2852,7 +2850,6 @@ behaviors {
         compatible = "zmk,behavior-hold-tap";
         flavor = RIGHT_INDEX_HOLDING_TYPE;
         hold-trigger-key-positions = <LEFT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
         tapping-term-ms = <RIGHT_INDEX_HOLDING_TIME>;
         quick-tap-ms = <RIGHT_INDEX_REPEAT_DECAY>;
         require-prior-idle-ms = <RIGHT_INDEX_STREAK_DECAY>;
@@ -2869,7 +2866,6 @@ behaviors {
         compatible = "zmk,behavior-hold-tap";
         flavor = RIGHT_INDEX_HOLDING_TYPE;
         hold-trigger-key-positions = <LEFT_HAND_KEYS THUMB_KEYS>;
-        hold-trigger-on-release; // wait for other home row mods
         tapping-term-ms = <RIGHT_INDEX_HOLDING_TIME>;
         quick-tap-ms = <RIGHT_INDEX_REPEAT_DECAY>;
         require-prior-idle-ms = <RIGHT_INDEX_STREAK_DECAY>;
