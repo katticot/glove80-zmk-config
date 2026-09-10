@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
-"""Regenerate docs/glove80.html (the Field Guide) from config/keymap.json.
+"""Regenerate docs/glove80.html (the Field Guide) from config/glove80.keymap.
 
-config/keymap.json is the Glove80 Layout Editor export: it carries the layer
-names, the 24x80 binding table, and the custom-behaviors blob. The previous
-Field Guide was generated from a different (now replaced) keymap, so it
-described the wrong layout. This script rebuilds it from the real one.
+The Field Guide is generated from config/glove80.keymap alone: it is what the
+firmware is built from, and it carries the layer names, the 24x80 binding table
+and every behaviour definition this script reads. Nothing else feeds the guide,
+so it cannot describe a layout the keyboard does not actually run.
+
+config/keymap.json is the Layout Editor's re-import export. It is a mirror, not
+a second authority: every run checks it against the keymap and fails if a cell,
+a layer, or the title disagrees.
 
 Usage:
     python3 tools/generate_field_guide.py [--check]
@@ -26,16 +30,56 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 KEYMAP = ROOT / "config" / "glove80.keymap"
-LAYOUT = ROOT / "config" / "keymap.json"
+MIRROR = ROOT / "config" / "keymap.json"
 OUT = ROOT / "docs" / "glove80.html"
+
+# The layout's name is not recorded in the keymap (the Layout Editor keeps that
+# in its own metadata), so it lives here rather than in a second data file.
+TITLE = "Glorious Engrammer v38"
 
 # Board geometry (MoErgo coordinates) is board-fixed, not keymap data. It is
 # taken from the existing Field Guide so this script does not duplicate it.
 
 
 # --------------------------------------------------------------------------
-# Layout Editor JSON -> per-layer binding strings
+# Keymap -> per-layer binding strings
 # --------------------------------------------------------------------------
+
+# A layer is `layer_<Name> { bindings = <...>; };`; its cell order is the
+# board's key order, which is what the Field Guide's geometry indexes into.
+LAYER_RE = re.compile(
+    r"^[ \t]*layer_(\w+)[ \t]*\{[ \t]*\n[ \t]*bindings[ \t]*=[ \t]*<(.*?)>[ \t]*;",
+    re.M | re.S,
+)
+
+KEYS_PER_LAYER = 80
+
+
+def parse_layers(text: str) -> tuple[list[str], list[list[str]]]:
+    """Read the layer names and the 24x80 binding table out of the keymap."""
+    names: list[str] = []
+    layers: list[list[str]] = []
+    for name, body in LAYER_RE.findall(text):
+        body = re.sub(r"/\*.*?\*/", " ", body, flags=re.S)
+        body = re.sub(r"//[^\n]*", " ", body)
+        # Every cell starts at `&`; nothing else in the block contains one.
+        cells = ["&" + " ".join(cell.split()) for cell in body.split("&")[1:]]
+        if len(cells) != KEYS_PER_LAYER:
+            raise SystemExit(f"generate_field_guide: layer {name} has "
+                             f"{len(cells)} keys, expected {KEYS_PER_LAYER}")
+        names.append(name)
+        layers.append(cells)
+    if not names:
+        raise SystemExit("generate_field_guide: no layers found in " + KEYMAP.name)
+    return names, layers
+
+
+# --------------------------------------------------------------------------
+# Layout Editor export -> the same binding strings (mirror check only)
+# --------------------------------------------------------------------------
+# config/keymap.json exists so the layout can be re-opened in the Glove80
+# Layout Editor. It is a mirror of the keymap, never an input to it: everything
+# below is used to prove the two agree, not to generate the Field Guide.
 
 def _arg(node) -> str:
     """Render one argument of a structured binding cell."""
@@ -48,7 +92,7 @@ def _arg(node) -> str:
     return f"{value}({', '.join(_arg(p) for p in params)})"
 
 
-def build_bindings(layout: dict) -> list[list[str]]:
+def mirror_bindings(layout: dict) -> list[list[str]]:
     """Turn the JSON cell grid into canonical ZMK binding strings."""
     layers = []
     for layer in layout["layers"]:
@@ -63,6 +107,64 @@ def build_bindings(layout: dict) -> list[list[str]]:
             row.append(" ".join(raw.split()))
         layers.append(row)
     return layers
+
+
+def check_mirror(text: str, names: list[str], bindings: list[list[str]]) -> None:
+    """Fail if config/keymap.json no longer describes this keymap.
+
+    The two files spell a few cells differently and always will: the editor
+    cannot express the argument of `&magic`, writes `&reset` for `&sys_reset`,
+    and writes a layer number where the keymap names the layer. So the
+    comparison is on what the Field Guide would *render*, which tolerates those
+    spellings but still catches a cell the two files disagree about.
+    """
+    if not MIRROR.exists():
+        return
+    layout = json.loads(MIRROR.read_text(encoding="utf-8"))
+    compiled = filter_os(text, active_os(text), defined_names(text))
+    labeler = Labeler(text, parse_defines(compiled), names)
+
+    drift: list[str] = []
+    if layout.get("title") != TITLE:
+        drift.append(f"title: mirror says {layout.get('title')!r}, "
+                     f"TITLE says {TITLE!r}")
+    mirror_names = layout.get("layer_names") or []
+    if mirror_names != names:
+        drift.append(f"layer names: mirror {mirror_names} != keymap {names}")
+
+    rows = mirror_bindings(layout)
+    if len(rows) != len(names):
+        drift.append(f"layers: mirror has {len(rows)}, keymap has {len(names)}")
+    for li, name in enumerate(names):
+        if li >= len(rows):
+            drift.append(f"layer {name}: missing from the mirror")
+            continue
+        mrow, krow = rows[li], bindings[li]
+        if len(mrow) != len(krow):
+            drift.append(f"layer {name}: mirror has {len(mrow)} keys, "
+                         f"keymap has {len(krow)}")
+            continue
+        for i, (m, k) in enumerate(zip(mrow, krow)):
+            if m == k:
+                continue
+            # &trans carries no content of its own, so a raw mismatch here is
+            # a binding replaced by inheritance (or the reverse).
+            if "&trans" in (m, k) or not m.startswith("&") or not k.startswith("&"):
+                drift.append(f"layer {name} key #{i}: mirror {m!r} != keymap {k!r}")
+                continue
+            dm, dk = labeler.describe(m, i, []), labeler.describe(k, i, [])
+            if (dm["tap"], dm["hold"], dm["kind"]) != (dk["tap"], dk["hold"], dk["kind"]):
+                drift.append(f"layer {name} key #{i}: mirror {m!r} ({dm['tap']}) "
+                             f"!= keymap {k!r} ({dk['tap']})")
+
+    if drift:
+        raise SystemExit(
+            "generate_field_guide: config/keymap.json has drifted from "
+            "config/glove80.keymap. The keymap is the source of truth, so "
+            "re-export the layout from the Glove80 Layout Editor (or fix the "
+            "keymap) before generating the Field Guide:\n  "
+            + "\n  ".join(drift[:20])
+            + (f"\n  ... and {len(drift) - 20} more" if len(drift) > 20 else ""))
 
 
 # --------------------------------------------------------------------------
@@ -636,9 +738,8 @@ render();
 """
 
 
-def build_payload(layout: dict, text: str, bindings: list[list[str]],
+def build_payload(names: list[str], text: str, bindings: list[list[str]],
                   geometry: dict, commit: str, sha256: str) -> dict:
-    names = layout["layer_names"]
     compiled = filter_os(text, active_os(text), defined_names(text))
     labeler = Labeler(text, parse_defines(compiled), names)
 
@@ -673,9 +774,7 @@ def build_payload(layout: dict, text: str, bindings: list[list[str]],
         raise SystemExit(f"generate_field_guide: empty key labels at {blanks}")
     payload = {
         "meta": {
-            "title": layout.get("title", "Glove80 layout"),
-            "uuid": layout.get("uuid", ""),
-            "date": layout.get("date", 0),
+            "title": TITLE,
             "layer_count": len(names),
             "letters": len(letters),
             "commit": commit,
@@ -788,7 +887,6 @@ def main() -> int:
                         help="fail if the committed Field Guide is out of date")
     args = parser.parse_args()
 
-    layout = json.loads(LAYOUT.read_text(encoding="utf-8"))
     text = KEYMAP.read_text(encoding="utf-8")
     shell = OUT.read_text(encoding="utf-8")
     # Pin to the commit that last changed the keymap, not to HEAD: the Field
@@ -800,8 +898,9 @@ def main() -> int:
         capture_output=True, text=True, check=True).stdout.strip()
     sha256 = hashlib.sha256(KEYMAP.read_bytes()).hexdigest()
 
-    bindings = build_bindings(layout)
-    payload = build_payload(layout, text, bindings, geometry_from(shell), commit, sha256)
+    names, bindings = parse_layers(text)
+    check_mirror(text, names, bindings)
+    payload = build_payload(names, text, bindings, geometry_from(shell), commit, sha256)
     html = render_html(shell, payload)
 
     if args.check:
