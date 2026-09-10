@@ -631,7 +631,15 @@ class Labeler:
         elif behavior == "&parang_left":
             out.update(tap="(", kind="")
         elif behavior == "&lower":
-            out.update(tap="Lower", hold="Lower layer", kind="layer")
+            # ZMK_TD_LAYER(lower, LAYER_Lower) is a tap-dance: tap once for a
+            # momentary hold of LAYER_Lower, tap twice to switch to it. This
+            # keymap leaves LAYER_Lower undefined, so the keymap's own
+            # `#ifndef LAYER_Lower` fallback makes it 0 - the single tap holds
+            # the base layer, which does nothing, and the double tap is a real
+            # "back to base" key. Read the number rather than assuming a Lower
+            # layer exists.
+            name = self.layer_name(self.defines.get("LAYER_Lower", "0"), "&lower")
+            out.update(tap=f"2× → {name}", kind="layer")
         elif behavior == "&magic":
             out.update(tap="Magic", hold="Magic layer", kind="layer")
         elif behavior == "&sticky_key_modtap":
@@ -871,11 +879,18 @@ def render_html(shell: str, payload: dict) -> str:
     base = payload["layers"][0]["keys"]
     label = lambda i: (base[i]["tap"] or "—").replace("<", "&lt;").replace(">", "&gt;")
 
-    # quick-find buttons: the base layer's layer-access keys
-    finds = [(i, k) for i, k in enumerate(base) if k["kind"] == "layer" and k["hold"]]
+    # quick-find buttons: the base layer's layer-access keys. Deduplicated on
+    # the layer they hold, so the two keys that both open Typing do not produce
+    # two identical buttons, and no button points at a layer that does not
+    # exist.
+    finds, seen = [], set()
+    for i, k in enumerate(base):
+        if k["kind"] == "layer" and k["hold"] and k["hold"] not in seen:
+            seen.add(k["hold"])
+            finds.append((i, k))
     quick = "".join(
         f'<button data-find="{i}" data-layer="0">Find {k["hold"].replace("<", "")}</button>'
-        for i, k in finds[:5])
+        for i, k in finds)
     html = re.sub(r'(<div class="quick">).*?(</div>)',
                   lambda m: m.group(1) + quick + m.group(2), html, flags=re.S)
 
