@@ -739,6 +739,9 @@ RENDERER = r"""
 const data=JSON.parse(document.getElementById('layout-data').textContent);
 const $=id=>document.getElementById(id);
 let layer=0,selected=64,pair=[];
+// Dev mode: switches lit by firmware log lines, and the layers ZMK reports active
+const live={down:new Set(),lit:new Map(),active:new Set([0]),follow:true,raw:false,bytes:0,lines:0,events:0,pending:null};
+const isLit=i=>live.down.has(i)||live.lit.has(i);
 const keys=i=>data.layers[layer].keys[i];
 function info(i){const k=keys(i);return k}
 function select(i){selected=i;render()}
@@ -748,7 +751,7 @@ function render(){
   data.physical.forEach((p,i)=>{
     const d=info(i),[w,h,x,y,angle,rx,ry]=p;
     const button=document.createElement('button');button.type='button';
-    button.className='key '+d.kind+(d.inherited?' inherited':'')+(i===selected?' selected':'');
+    button.className='key '+d.kind+(d.inherited?' inherited':'')+(i===selected?' selected':'')+(isLit(i)?' live':'');
     button.dataset.position=i;
     button.style.cssText=`left:${(x+4)/18}%;top:${(y+4)/8.6}%;width:${(w-8)/18}%;height:${(h-8)/8.6}%;transform:rotate(${angle/100}deg);transform-origin:${(rx-x-4)/(w-8)*100}% ${(ry-y-4)/(h-8)*100}%;`;
     const match=query?(query.startsWith('#')?String(i)===query.slice(1):query.length===1?d.tap.toLowerCase()===query:[d.tap,d.hold,d.raw].some(v=>String(v).toLowerCase().includes(query))):pair.includes(i);
@@ -786,6 +789,73 @@ document.querySelectorAll('[data-find]').forEach(b=>b.onclick=()=>{layer=Number(
 document.querySelectorAll('[data-pair]').forEach(b=>b.onclick=()=>{layer=0;$('search').value='';pair=b.dataset.pair.split(',').map(Number);selected=pair[0];render();$('board').scrollIntoView({behavior:'smooth',block:'center'})});
 $('typing').onkeydown=e=>{$('event').textContent=`Received: ${e.key===' '?'Space':e.key} \u00b7 code: ${e.code} \u00b7 ${[e.ctrlKey?'Ctrl':'',e.altKey?'Alt':'',e.shiftKey?'Shift':'',e.metaKey?'Cmd':''].filter(Boolean).join(' + ')||'no modifiers'}`};
 $('clear').onclick=()=>{$('typing').value='';$('event').textContent='Waiting for input.';$('typing').focus()};
+// Dev mode: read the ZMK USB log (CONFIG_ZMK_USB_LOGGING=y) over Web Serial.
+// Switch state comes from the lines nearest the hardware: the left half logs
+// "kscan_process_msgq: ... position: P, pressed: true|false"; a right-half
+// switch arrives as "peripheral_event_work_callback: Trigger key position state
+// change for P" (no direction, so it toggles). keymap.c then logs "layer_id: L
+// position: P, binding name: B" for the behavior, and "layer_changed: layer L
+// state S" when a layer turns on or off. The USB log drops lines under load, so
+// a keymap line with no switch line still flashes its key.
+const layerName=l=>data.layers[l]?data.layers[l].name:'layer '+l;
+function liveLog(text){const log=$('liveLog');log.textContent+=text+'\n';
+  const lines=log.textContent.split('\n');if(lines.length>301)log.textContent=lines.slice(-301).join('\n');
+  log.scrollTop=log.scrollHeight}
+function liveStats(){$('liveStats').textContent=`${live.bytes} bytes · ${live.lines} lines · ${live.events} key events`}
+function liveLayers(){$('liveLayers').textContent='Active layers: '+[...live.active].sort((a,b)=>a-b).map(l=>l+' '+layerName(l)).join(' · ')}
+// Repaint only the lit state; render() rebuilds all 80 buttons, too slow per log line.
+function paintLive(){document.querySelectorAll('#board .key').forEach(b=>b.classList.toggle('live',isLit(Number(b.dataset.position))))}
+// Keep a key lit at least 300 ms so a quick tap is still visible.
+function hold(p){clearTimeout(live.lit.get(p));live.lit.set(p,setTimeout(()=>{live.lit.delete(p);paintLive()},300))}
+function switchState(p,down){if(down){live.down.add(p);hold(p);live.events++}else live.down.delete(p);paintLive();liveStats()}
+function onLogLine(raw){
+  const line=raw.replace(/\x1b\[[0-9;]*m/g,'').replace(/\r/g,'');
+  live.lines++;if(live.raw&&line.trim())liveLog('» '+line);
+  let m=line.match(/kscan_process_msgq: .*position: (\d+), pressed: (true|false)/);
+  if(m){switchState(+m[1],m[2]==='true');return}
+  // A right-half trigger carries no direction: a release is followed by an
+  // "upstroke"/"keyrelease" line, a press goes straight to its behavior.
+  m=line.match(/Trigger key position state change for (\d+)/);
+  if(m){if(live.pending!==null)switchState(live.pending,true);live.pending=+m[1];return}
+  m=line.match(/Ignore upstroke at position (\d+)|^.*?: (\d+) bubble undecided hold-tap keyrelease|(?:capturing|bubbling) (\d+) up event/);
+  if(m){const p=+(m[1]||m[2]||m[3]);if(live.pending===p){live.pending=null;switchState(p,false)}return}
+  m=line.match(/layer_id: \d+ position: (\d+),|combo: capturing position event (\d+)|capturing (\d+) down event/);
+  if(m&&live.pending===+(m[1]||m[2]||m[3])){switchState(live.pending,true);live.pending=null}
+  // &kp reports its own press/release: resyncs a toggle that missed a dropped line
+  m=line.match(/on_keymap_binding_(pressed|released): position (\d+)/);
+  if(m){const p=+m[2],down=m[1]==='pressed';if(live.down.has(p)!==down){down?live.down.add(p):live.down.delete(p);paintLive()}return}
+  m=line.match(/layer_id: (\d+) position: (\d+), binding name: (\S+)/);
+  if(m){const l=+m[1],p=+m[2];if(!live.down.has(p)){hold(p);paintLive()}
+    liveLog(`#${p} ${live.down.has(p)?'down':'up  '} · ${layerName(l)} (${l}) · ${m[3]}`);return}
+  m=line.match(/layer_changed: layer (\d+) state (\d)/);
+  if(m){const l=+m[1],on=m[2]!=='0';on?live.active.add(l):live.active.delete(l);live.active.add(0);
+    liveLog(`layer ${on?'ON ':'OFF'} ${layerName(l)} (${l})`);liveLayers();
+    if(live.follow){layer=Math.max(...live.active);pair=[];render()}}
+}
+function feed(buf,chunk){live.bytes+=chunk.length;const lines=(buf+chunk).split('\n');const rest=lines.pop();
+  lines.forEach(onLogLine);liveStats();return rest}
+async function liveConnect(){
+  if(!('serial' in navigator)){$('liveStatus').textContent=noSerial;return}
+  let port;try{port=await navigator.serial.requestPort({filters:[{usbVendorId:0x16c0}]})}
+  catch(e){$('liveStatus').textContent=e.name==='NotFoundError'?'No Glove80 serial port chosen. Is the left half on USB with the debug firmware?':'Port request failed: '+e.message;return}
+  try{await port.open({baudRate:115200,bufferSize:65536})}
+  catch(e){$('liveStatus').textContent='Port busy or unavailable: '+e.message+'. Close any cat/screen on /dev/cu.usbmodem*.';return}
+  // Assert DTR/RTS like a terminal does; harmless if the firmware ignores them.
+  try{await port.setSignals({dataTerminalReady:true,requestToSend:true})}catch(e){}
+  $('liveStatus').textContent='Connected · press keys on the Glove80';$('liveConnect').disabled=true;liveLayers();liveStats();
+  const reader=port.readable.pipeThrough(new TextDecoderStream()).getReader();let buf='';
+  try{for(;;){const{value,done}=await reader.read();if(done)break;buf=feed(buf,value)}}
+  catch(e){liveLog('read error: '+e.message)}
+  finally{reader.releaseLock();await port.close().catch(()=>{});
+    $('liveStatus').textContent='Disconnected.';$('liveConnect').disabled=false}
+}
+const noSerial='This browser has no Web Serial (Safari, Firefox and Zen lack it). Open the page in Chrome or Edge: open -a "Google Chrome" docs/glove80.html';
+if(!('serial' in navigator)){$('liveStatus').textContent=noSerial;$('liveStatus').classList.add('warn')}
+$('liveConnect').onclick=liveConnect;
+$('liveFollow').onclick=()=>{live.follow=!live.follow;$('liveFollow').setAttribute('aria-pressed',String(live.follow));
+  $('liveFollow').textContent='Follow active layer: '+(live.follow?'on':'off')};
+$('liveRaw').onclick=()=>{live.raw=!live.raw;$('liveRaw').setAttribute('aria-pressed',String(live.raw));
+  $('liveRaw').textContent='Raw log: '+(live.raw?'on':'off')};
 const bad=[];if(data.layers.length!==data.meta.layer_count)bad.push('layer count');
 data.layers.forEach(l=>{if(l.keys.length!==80)bad.push('keys in '+l.name)});
 if(data.meta.letters!==26)bad.push('base letters ('+data.meta.letters+')');

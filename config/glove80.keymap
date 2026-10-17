@@ -1156,20 +1156,6 @@ combos {
     #ifndef COMBO_FIRING_DECAY
     #define COMBO_FIRING_DECAY 50
     #endif
-    #ifdef LAYER_Gaming
-    combo_gaming_enter {
-        timeout-ms = <COMBO_FIRING_DECAY>;
-        key-positions = <POS_LH_T3 POS_LH_T6>;
-        bindings = <&enter_gaming>;
-        layers = <0>;
-    };
-    combo_gaming_exit {
-        timeout-ms = <COMBO_FIRING_DECAY>;
-        key-positions = <POS_LH_T3 POS_LH_T6>;
-        bindings = <&exit_gaming>;
-        layers = <LAYER_Gaming>;
-    };
-    #endif
     #ifdef _A_TAB
     combo_alt_tab_switcher {
         timeout-ms = <COMBO_FIRING_DECAY>;
@@ -4287,7 +4273,7 @@ macros {
 
         layer_ColemakDHm {
             bindings = <
-                       &kp F1                            &kp F2                            &kp F3                            &kp F4                            &kp F5                                                                                                                                                                                                                                           &kp F6                             &kp F7                             &kp F8                             &kp F9                       &kp F10
+                       &kp F1                            &kp F2                            &kp F3                            &kp F4                            &kp F5                                                                                                                                                                                                                                           &kp F6                             &kp F7                             &kp F8                             &kp F9                       &enter_gaming
                     &kp EQUAL                            &kp N1                            &kp N2                            &kp N3                            &kp N4                 &kp N5                                                                                                                                                                                 &kp N6                             &kp N7                             &kp N8                             &kp N9                             &kp N0                      &kp BSLH
                     &kp GRAVE                             &kp Q  &LeftRing2 (W, LAYER_ColemakDHm)                             &kp F                             &kp P                  &kp B                                                                                                                                                                                  &kp J                              &kp L                              &kp U  &RightRing2 (Y, LAYER_ColemakDHm)                           &kp SEMI                     &kp MINUS
                    &caps_word  &LeftPinky (A, LAYER_ColemakDHm)  &LeftRing1 (R, LAYER_ColemakDHm)  &LeftMiddy (S, LAYER_ColemakDHm)  &LeftIndex (T, LAYER_ColemakDHm)  &plain LAYER_Typing G                                                                                                                                                                  &plain LAYER_Typing M  &RightIndex (N, LAYER_ColemakDHm)  &RightMiddy (E, LAYER_ColemakDHm)  &RightRing1 (I, LAYER_ColemakDHm)  &RightPinky (O, LAYER_ColemakDHm)                       &kp SQT
@@ -4447,7 +4433,7 @@ macros {
 
         layer_Gaming {
             bindings = <
-    &trans     &trans  &trans  &trans  &trans                                                                                             &trans  &trans     &trans   &trans    &trans
+    &trans     &trans  &trans  &trans  &trans                                                                                             &trans  &trans     &trans   &trans    &exit_gaming
     &trans     &trans  &trans  &trans  &trans   &trans                                                                            &trans  &trans  &trans     &trans   &trans    &trans
      &kp T    &kp TAB   &kp Q   &kp W   &kp E    &kp R                                                                             &kp T   &kp Y   &kp U      &kp I    &kp O     &kp P
      &kp G  &kp LSHFT   &kp A   &kp S   &kp D    &kp F                                                                             &kp G   &kp H   &kp J      &kp K    &kp L  &kp SEMI
