@@ -238,7 +238,7 @@
 #define DIFFICULTY_LEVEL  4  // 0:custom, 1:easy -> 5:hard (see below)
 #define ENFORCE_BILATERAL    // cancels single-handed home row mod+tap
 #define SHIFT_FORGIVENESS  // requires 24.08-beta1 or newer firmware
-#define USE_NUMPAD_KEYCODES  // Number layer sends KP_* keycodes, not the number row
+//#define USE_NUMPAD_KEYCODES  // Disabled: allows Shift/Maj + number to produce symbols (!, @, #)
 // TIP: Add more setting overrides here instead of editing them below.
 
 //////////////////////////////////////////////////////////////////////////////
