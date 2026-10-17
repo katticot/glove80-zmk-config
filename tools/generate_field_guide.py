@@ -898,14 +898,25 @@ def render_html(shell: str, payload: dict) -> str:
     html = re.sub(
         r'(<ol>).*?(</ol>)',
         lambda m: m.group(1)
-        + "<li><strong>Right first:</strong> power off, connect USB, hold positions "
-          f'<button class="plain" data-pair="30,79">#30 + #79</button> (currently '
-          f'{label(30)} + {label(79)}), then power on. Copy your UF2 to '
-          "<code>GLV80RHBOOT</code>.</li>"
-        + "<li><strong>Left:</strong> power off, connect USB, hold positions "
-          f'<button class="plain" data-pair="64,25">#64 + #25</button> (currently '
-          f'{label(64)} + {label(25)}), then power on. Copy the same UF2 to '
-          "<code>GLV80LHBOOT</code>.</li>"
+        + "<li><strong>Flash order:</strong> Always flash <strong>Right half first</strong>, then <strong>Left half second</strong>. Both halves use the exact same combined UF2.</li>"
+        + "<li><strong>Method 1 · Power-on hardware shortcut (failsafe):</strong>"
+        + "<ul>"
+        + "<li><strong>Right half:</strong> Power switch OFF, plug in USB, hold physical switches "
+        + f'<button class="plain" data-pair="30,79">#30 + #79</button> (currently '
+        + f'{label(30)} + {label(79)}), then switch power ON. Volume <code>GLV80RHBOOT</code> mounts. Copy your UF2 to it.</li>'
+        + "<li><strong>Left half:</strong> Power switch OFF, plug in USB, hold physical switches "
+        + f'<button class="plain" data-pair="64,25">#64 + #25</button> (currently '
+        + f'{label(64)} + {label(25)}), then switch power ON. Volume <code>GLV80LHBOOT</code> mounts. Copy the same UF2 to it.</li>'
+        + "</ul></li>"
+        + "<li><strong>Method 2 · Magic layer shortcut (while powered on & USB connected):</strong>"
+        + "<ul>"
+        + "<li><strong>Right half:</strong> Plug in USB. Hold Right Magic thumb switch "
+        + f'<button class="plain" data-pair="79,45">#79</button> and tap '
+        + f'<button class="plain" data-pair="79,45">#45</button> ({label(45)}). Volume <code>GLV80RHBOOT</code> mounts.</li>'
+        + "<li><strong>Left half:</strong> Plug in USB. Hold Left Magic thumb switch "
+        + f'<button class="plain" data-pair="64,34">#64</button> and tap '
+        + f'<button class="plain" data-pair="64,34">#34</button> ({label(34)}). Volume <code>GLV80LHBOOT</code> mounts.</li>'
+        + "</ul></li>"
         + m.group(2),
         html, flags=re.S)
 
