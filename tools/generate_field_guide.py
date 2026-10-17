@@ -677,6 +677,8 @@ class Labeler:
             name = (self.layer_name(token, "&tog") if token.isdigit()
                     else token.replace("LAYER_", ""))
             out.update(tap=f"Toggle {name}", kind="layer")
+        elif behavior in ("&enter_gaming", "&exit_gaming"):
+            out.update(tap="Toggle Gaming", kind="layer")
         elif behavior == "&rgb_ug":
             out.update(tap=RGB_NAMES.get(args[0], args[0]), kind="action")
         elif behavior in ("&mmv", "&msc", "&mkp"):

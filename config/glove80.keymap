@@ -95,6 +95,22 @@
             bindings
                 = <&rgb_ug RGB_STATUS>;
         };
+        enter_gaming: enter_gaming {
+            label = "ENTER_GAMING";
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            wait-ms = <0>;
+            tap-ms = <0>;
+            bindings = <&tog LAYER_Gaming>, <&rgb_ug RGB_ON>;
+        };
+        exit_gaming: exit_gaming {
+            label = "EXIT_GAMING";
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            wait-ms = <0>;
+            tap-ms = <0>;
+            bindings = <&tog LAYER_Gaming>, <&rgb_ug RGB_OFF>;
+        };
     };
 };
 
@@ -1141,11 +1157,17 @@ combos {
     #define COMBO_FIRING_DECAY 50
     #endif
     #ifdef LAYER_Gaming
-    combo_gaming_layer_toggle {
+    combo_gaming_enter {
         timeout-ms = <COMBO_FIRING_DECAY>;
         key-positions = <POS_LH_T3 POS_LH_T6>;
-        bindings = <&tog LAYER_Gaming>;
-        layers = <0 LAYER_Gaming>;
+        bindings = <&enter_gaming>;
+        layers = <0>;
+    };
+    combo_gaming_exit {
+        timeout-ms = <COMBO_FIRING_DECAY>;
+        key-positions = <POS_LH_T3 POS_LH_T6>;
+        bindings = <&exit_gaming>;
+        layers = <LAYER_Gaming>;
     };
     #endif
     #ifdef _A_TAB
@@ -4269,7 +4291,7 @@ macros {
                     &kp EQUAL                            &kp N1                            &kp N2                            &kp N3                            &kp N4                 &kp N5                                                                                                                                                                                 &kp N6                             &kp N7                             &kp N8                             &kp N9                             &kp N0                      &kp BSLH
                     &kp GRAVE                             &kp Q  &LeftRing2 (W, LAYER_ColemakDHm)                             &kp F                             &kp P                  &kp B                                                                                                                                                                                  &kp J                              &kp L                              &kp U  &RightRing2 (Y, LAYER_ColemakDHm)                           &kp SEMI                     &kp MINUS
                    &caps_word  &LeftPinky (A, LAYER_ColemakDHm)  &LeftRing1 (R, LAYER_ColemakDHm)  &LeftMiddy (S, LAYER_ColemakDHm)  &LeftIndex (T, LAYER_ColemakDHm)  &plain LAYER_Typing G                                                                                                                                                                  &plain LAYER_Typing M  &RightIndex (N, LAYER_ColemakDHm)  &RightMiddy (E, LAYER_ColemakDHm)  &RightRing1 (I, LAYER_ColemakDHm)  &RightPinky (O, LAYER_ColemakDHm)                       &kp SQT
- &sticky_key_modtap LSFT LSFT                             &kp Z                             &kp X                             &kp C                             &kp D                  &kp V                     &lower        &tog LAYER_Gaming                   &kp DOWN                &kp LEFT                 &kp RIGHT                          &none                  &kp K                              &kp H                          &kp COMMA                            &kp DOT                           &kp FSLH  &sticky_key_modtap RSFT RSFT
+ &sticky_key_modtap LSFT LSFT                             &kp Z                             &kp X                             &kp C                             &kp D                  &kp V                     &lower             &enter_gaming                   &kp DOWN                &kp LEFT                 &kp RIGHT                          &none                  &kp K                              &kp H                          &kp COMMA                            &kp DOT                           &kp FSLH  &sticky_key_modtap RSFT RSFT
          &magic LAYER_Magic 0                          &kp HOME                         &kp PG_UP                         &kp PG_DN            &kp END                         &space LAYER_Cursor SPACE &thumb LAYER_Number ESC  &kp DELETE  &kp TAB  &kp ENTER  &kp BACKSPACE                          &parang_left                           &kp LBKT                           &kp RBKT                      &parang_right          &magic LAYER_Magic 0
             >;
         };
@@ -4429,8 +4451,8 @@ macros {
     &trans     &trans  &trans  &trans  &trans   &trans                                                                            &trans  &trans  &trans     &trans   &trans    &trans
      &kp T    &kp TAB   &kp Q   &kp W   &kp E    &kp R                                                                             &kp T   &kp Y   &kp U      &kp I    &kp O     &kp P
      &kp G  &kp LSHFT   &kp A   &kp S   &kp D    &kp F                                                                             &kp G   &kp H   &kp J      &kp K    &kp L  &kp SEMI
-     &kp B  &kp LCTRL   &kp Z   &kp X   &kp C    &kp V    &kp ESC  &tog LAYER_Gaming            &kp RET  &kp BSPC  &kp DEL   &none   &kp B   &kp N   &kp M  &kp COMMA  &kp DOT  &kp FSLH
-    &trans     &trans  &trans  &trans  &trans           &kp SPACE           &kp LALT           &kp LGUI  &tog LAYER_Gaming   &trans  &trans          &trans  &trans     &trans   &trans    &trans
+     &kp B  &kp LCTRL   &kp Z   &kp X   &kp C    &kp V    &kp ESC       &exit_gaming            &kp RET  &kp BSPC  &kp DEL   &none   &kp B   &kp N   &kp M  &kp COMMA  &kp DOT  &kp FSLH
+    &trans     &trans  &trans  &trans  &trans           &kp SPACE           &kp LALT           &kp LGUI       &exit_gaming   &trans  &trans          &trans  &trans     &trans   &trans    &trans
             >;
         };
 
