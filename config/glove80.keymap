@@ -101,7 +101,7 @@
             #binding-cells = <0>;
             wait-ms = <0>;
             tap-ms = <0>;
-            bindings = <&tog LAYER_Gaming>, <&rgb_ug RGB_ON>;
+            bindings = <&tog LAYER_Gaming>, <&rgb_ug RGB_EFS_CMD 0>, <&rgb_ug RGB_COLOR_HSB(120,100,60)>, <&rgb_ug RGB_ON>;
         };
         exit_gaming: exit_gaming {
             label = "EXIT_GAMING";
@@ -4452,7 +4452,7 @@ macros {
      &kp T    &kp TAB   &kp Q   &kp W   &kp E    &kp R                                                                             &kp T   &kp Y   &kp U      &kp I    &kp O     &kp P
      &kp G  &kp LSHFT   &kp A   &kp S   &kp D    &kp F                                                                             &kp G   &kp H   &kp J      &kp K    &kp L  &kp SEMI
      &kp B  &kp LCTRL   &kp Z   &kp X   &kp C    &kp V    &kp ESC       &exit_gaming            &kp RET  &kp BSPC  &kp DEL   &none   &kp B   &kp N   &kp M  &kp COMMA  &kp DOT  &kp FSLH
-    &trans     &trans  &trans  &trans  &trans           &kp SPACE           &kp LALT           &kp LGUI       &exit_gaming   &trans  &trans          &trans  &trans     &trans   &trans    &trans
+    &trans     &trans  &trans  &trans  &trans           &kp SPACE           &kp LALT           &kp LGUI             &trans   &trans  &trans          &trans  &trans     &trans   &trans    &trans
             >;
         };
 
