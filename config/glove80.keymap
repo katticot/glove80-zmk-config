@@ -4433,12 +4433,12 @@ macros {
 
         layer_Gaming {
             bindings = <
-    &trans     &trans  &trans  &trans  &trans                                                                                             &trans  &trans     &trans   &trans    &exit_gaming
-    &trans     &trans  &trans  &trans  &trans   &trans                                                                            &trans  &trans  &trans     &trans   &trans    &trans
-     &kp T    &kp TAB   &kp Q   &kp W   &kp E    &kp R                                                                             &kp T   &kp Y   &kp U      &kp I    &kp O     &kp P
-     &kp G  &kp LSHFT   &kp A   &kp S   &kp D    &kp F                                                                             &kp G   &kp H   &kp J      &kp K    &kp L  &kp SEMI
-     &kp B  &kp LCTRL   &kp Z   &kp X   &kp C    &kp V    &kp ESC       &exit_gaming            &kp RET  &kp BSPC  &kp DEL   &none   &kp B   &kp N   &kp M  &kp COMMA  &kp DOT  &kp FSLH
-    &trans     &trans  &trans  &trans  &trans           &kp SPACE           &kp LALT           &kp LGUI             &trans   &trans  &trans          &trans  &trans     &trans   &trans    &trans
+    &trans        &trans        &trans        &trans        &trans        &trans        &trans        &trans        &trans        &exit_gaming
+    &trans        &trans        &trans        &trans        &trans        &trans        &trans        &trans        &trans        &trans        &trans        &trans
+    &kp T         &kp TAB       &kp Q         &kp W         &kp E         &kp R         &trans        &trans        &trans        &kp Y         &trans        &trans
+    &kp G         &kp LSHFT     &kp A         &kp S         &kp D         &kp F         &kp M         &kp N         &kp E         &kp I         &kp O         &trans
+    &kp B         &kp LCTRL     &kp Z         &kp X         &kp C         &kp V         &none         &none         &none         &trans        &trans        &trans        &trans        &trans        &trans        &trans        &trans        &kp RSHFT
+    &trans        &trans        &trans        &trans        &trans        &kp SPACE     &kp ESC       &trans        &trans        &trans        &trans        &trans        &trans        &trans        &trans        &trans
             >;
         };
 
