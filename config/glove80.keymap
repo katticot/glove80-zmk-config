@@ -4492,3 +4492,17 @@ macros {
 
     };
 };
+
+/* DEBUG ONLY: USB CDC-ACM console for CONFIG_ZMK_USB_LOGGING (mirrors the zmk-usb-logging snippet) */
+/ {
+    chosen {
+        zephyr,console = &snippet_zmk_usb_logging_uart;
+        zephyr,shell-uart = &snippet_zmk_usb_logging_uart;
+    };
+};
+
+&zephyr_udc0 {
+    snippet_zmk_usb_logging_uart: snippet_zmk_usb_logging_uart {
+        compatible = "zephyr,cdc-acm-uart";
+    };
+};
